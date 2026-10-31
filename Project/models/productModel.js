@@ -94,18 +94,18 @@ const keAngka = (id) => Number(id);
 // ----------------------------------------------------------------
 
 // Semua produk
-export function getAll() {
+function getAll() {
   return products.map(salin);
 }
 
 // Satu produk berdasarkan ID, atau null bila tidak ada
-export function getById(id) {
+function getById(id) {
   const produk = products.find((p) => p.id === keAngka(id));
   return produk ? salin(produk) : null;
 }
 
 // Produk berdasarkan kategori (tidak membedakan huruf besar/kecil)
-export function getByCategory(kategori) {
+ function getByCategory(kategori) {
   const kunci = String(kategori).trim().toLowerCase();
   return products
     .filter((p) => p.kategori.toLowerCase() === kunci)
@@ -113,7 +113,7 @@ export function getByCategory(kategori) {
 }
 
 // Cari produk dari nama, deskripsi, atau nama UMKM
-export function search(keyword) {
+function search(keyword) {
   const kunci = String(keyword).trim().toLowerCase();
   if (kunci === '') return getAll();
 
@@ -128,12 +128,12 @@ export function search(keyword) {
 }
 
 // Daftar kategori yang tersedia
-export function getCategories() {
+function getCategories() {
   return [...KATEGORI];
 }
 
 // Jumlah seluruh produk
-export function count() {
+function count() {
   return products.length;
 }
 
@@ -143,7 +143,7 @@ export function count() {
 // ----------------------------------------------------------------
 
 // Tambah produk baru, mengembalikan produk yang tersimpan
-export function create({ nama, kategori, harga, deskripsi, umkm }) {
+function create({ nama, kategori, harga, deskripsi, umkm }) {
   const produkBaru = {
     id: nextId++,
     nama,
@@ -157,7 +157,7 @@ export function create({ nama, kategori, harga, deskripsi, umkm }) {
 }
 
 // Ubah sebagian atau seluruh data produk, mengembalikan produk terbaru atau null
-export function update(id, data) {
+function update(id, data) {
   const produk = products.find((p) => p.id === keAngka(id));
   if (!produk) return null;
 
@@ -171,10 +171,22 @@ export function update(id, data) {
 }
 
 // Hapus produk, mengembalikan produk yang dihapus atau null
-export function remove(id) {
+function remove(id) {
   const index = products.findIndex((p) => p.id === keAngka(id));
   if (index === -1) return null;
 
   const [dihapus] = products.splice(index, 1);
   return salin(dihapus);
 }
+
+module.exports ={
+  getAll,
+  getById,
+  getByCategory,
+  search,
+  getCategories,
+  count,
+  create,
+  update,
+  remove,
+};
