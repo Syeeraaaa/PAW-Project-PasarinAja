@@ -1,9 +1,12 @@
 const produkModel = require('../models/productModel');
 const config = require('../config/config');
+const { formatRupiah } = require('../utils/formatter');
+
+
 
 const renderHomePage = (req, res) => {
   const produk = produkModel.getAll();
-  res.render('index', { appName: config.appName, produk });
+  res.render('index', { appName: config.appName, produk, formatRupiah });
 };
 
 const getStatus = (req, res) => {

@@ -4,13 +4,15 @@
 const logger = (req, res, next) => {
   const mulai = Date.now();
 
+  const { formatTimestamp } = require('../utils/formatter');
+
   // 'finish' terjadi saat response selesai dikirim,
   // jadi status code dan durasi baru bisa dicatat di sini
   res.on('finish', () => {
     const durasi = Date.now() - mulai;
     const waktu = new Date().toLocaleString('id-ID', { hour12: false });
     console.log(
-      `[${waktu}] ${req.method} ${req.originalUrl} ${res.statusCode} - ${durasi}ms`
+      `[${formatTimestamp()}] ${req.method} ${req.originalUrl} ${res.statusCode}`
     );
   });
 
