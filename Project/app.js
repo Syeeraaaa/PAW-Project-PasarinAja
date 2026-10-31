@@ -18,6 +18,11 @@ app.use(express.urlencoded({ extended: true }));
 // Panggil Routes
 app.use('/', routes);
 
+//handler 404
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route tidak ditemukan' });
+});
+
 // Jalankan Server
 app.listen(PORT, () => {
   console.log(`Server PasarinAja berjalan di http://localhost:${PORT}`);
