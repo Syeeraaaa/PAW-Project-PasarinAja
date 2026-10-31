@@ -1,4 +1,4 @@
-const produkModel = require('../models/produkModel');
+const produkModel = require('../models/productModel');
 const config = require('../config/config');
 
 const renderHomePage = (req, res) => {
@@ -15,7 +15,7 @@ const getStatus = (req, res) => {
 };
 
 const getApiProducts = (req, res) => {
-  res.status(200).json(produkModel.getAll());
+  res.status(200).json(Model.getAll());
 };
 
 module.exports = { renderHomePage, getStatus, getApiProducts };
