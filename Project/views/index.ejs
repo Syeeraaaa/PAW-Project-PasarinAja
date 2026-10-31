@@ -1,0 +1,727 @@
+<%- include('partials/head', { appName: appName }) %>
+<body class="bg-krem text-tinta font-sans">
+
+<div class="flex flex-col md:flex-row min-h-screen">
+
+    <!-- SIDEBAR -->
+    <aside class="w-full md:w-64 bg-hijau text-white p-6 flex flex-col md:min-h-screen">
+
+        <div class="mb-10">
+            <h1 class="text-2xl font-extrabold tracking-wide">
+                PASEBAN KAWIS
+            </h1>
+            <p class="text-sm text-green-100 mt-1">Produk UMKM Desa</p>
+        </div>
+
+        <nav class="flex flex-col gap-3" id="sidebarMenu">
+
+            <button onclick="tampilkanHalaman('dashboard')"
+                data-halaman="dashboard"
+                class="menu-link text-left px-4 py-3 rounded-lg hover:bg-hijau-muda transition">
+                Dashboard
+            </button>
+
+            <button onclick="tampilkanHalaman('katalog')"
+                data-halaman="katalog"
+                class="menu-link text-left px-4 py-3 rounded-lg bg-hijau-muda font-semibold transition">
+                E-Katalog
+            </button>
+
+            <button onclick="tampilkanHalaman('chatbot')"
+                data-halaman="chatbot"
+                class="menu-link text-left px-4 py-3 rounded-lg hover:bg-hijau-muda transition">
+                Chatbot AI
+            </button>
+
+            <button onclick="tampilkanHalaman('pendaftaran')"
+                data-halaman="pendaftaran"
+                class="menu-link text-left px-4 py-3 rounded-lg hover:bg-hijau-muda transition">
+                Form Pendaftaran
+            </button>
+
+        </nav>
+
+        <div class="mt-8 md:mt-auto">
+            <button onclick="tampilkanHalaman('akun')"
+                data-halaman="akun"
+                class="menu-link w-full text-left px-4 py-3 rounded-lg hover:bg-hijau-muda transition">
+                Akun Saya
+            </button>
+        </div>
+
+    </aside>
+
+    <!-- KONTEN UTAMA -->
+    <main class="flex-1 p-6 md:p-10 min-w-0">
+
+        <!-- HALAMAN DASHBOARD -->
+        <section id="dashboard" class="halaman hidden">
+
+            <h2 class="text-3xl font-bold mb-2">Dashboard</h2>
+
+            <p class="text-gray-500 mb-8">
+                Selamat datang kembali!!
+            </p>
+
+            <div class="bg-hijau text-white rounded-2xl p-8 mb-8">
+                <h3 class="text-2xl font-bold mb-3">
+                    Kelola usaha lebih mudah
+                </h3>
+
+                <p>
+                    Promosikan produk dan kembangkan UMKM Anda!
+                </p>
+            </div>
+
+            <h3 class="text-xl font-bold mb-5">Menu Utama</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+                <button onclick="tampilkanHalaman('katalog')"
+                    class="text-left bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+                    <div class="text-3xl mb-3">🛍️</div>
+                    <h4 class="text-xl font-bold text-hijau mb-2">E-Katalog</h4>
+                    <p class="text-gray-500 mb-4">Lihat produk UMKM</p>
+                    <span class="text-hijau font-semibold">Lihat Produk →</span>
+                </button>
+
+                <button onclick="tampilkanHalaman('akun')"
+                    class="text-left bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+                    <div class="text-3xl mb-3">👤</div>
+                    <h4 class="text-xl font-bold text-hijau mb-2">Akun Saya</h4>
+                    <p class="text-gray-500 mb-4">Informasi pemilik akun</p>
+                    <span class="text-hijau font-semibold">Lihat Akun →</span>
+                </button>
+
+                <button onclick="tampilkanHalaman('chatbot')"
+                    class="text-left bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+                    <div class="text-3xl mb-3">🤖</div>
+                    <h4 class="text-xl font-bold text-hijau mb-2">Chatbot AI</h4>
+                    <p class="text-gray-500 mb-4">Tanya AI untuk membantu usaha</p>
+                    <span class="text-hijau font-semibold">Tanya AI →</span>
+                </button>
+
+                <button onclick="tampilkanHalaman('pendaftaran')"
+                    class="text-left bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+                    <div class="text-3xl mb-3">📝</div>
+                    <h4 class="text-xl font-bold text-hijau mb-2">Form Pendaftaran</h4>
+                    <p class="text-gray-500 mb-4">Daftarkan usaha UMKM Anda</p>
+                    <span class="text-hijau font-semibold">Daftar Sekarang →</span>
+                </button>
+
+            </div>
+
+        </section>
+
+        <!-- HALAMAN E-KATALOG -->
+        <section id="katalog" class="halaman">
+
+            <h2 class="text-3xl font-bold mb-2">E-Katalog</h2>
+
+            <p class="text-gray-500 mb-6">
+                Daftar produk UMKM Desa Paseban Kawis
+            </p>
+
+            <!-- STATUS SERVER -->
+            <div class="flex items-center gap-2 mb-6 text-sm">
+                <span id="status-dot" class="w-3 h-3 rounded-full bg-gray-400"></span>
+                <span id="status-label">Memeriksa koneksi server...</span>
+            </div>
+
+            <!-- PENCARIAN -->
+            <div class="mb-8">
+                <input
+                    type="text"
+                    id="searchProduk"
+                    placeholder="Cari produk....."
+                    class="w-full px-5 py-4 rounded-xl bg-white border border-gray-200 outline-none focus:ring-2 focus:ring-hijau">
+            </div>
+
+            <!-- DAFTAR PRODUK -->
+            <div id="daftarProduk" class="flex flex-col gap-7">
+
+                <% if (produk && produk.length > 0) { %>
+
+                    <% produk.forEach(function(item) { %>
+
+                        <article class="produk-card bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+
+                            <div class="w-full h-64 bg-gray-100 rounded-xl flex items-center justify-center overflow-hidden mb-5">
+
+                                <% if (item.gambar) { %>
+                                    <img
+                                        src="<%= item.gambar %>"
+                                        alt="<%= item.nama %>"
+                                        class="w-full h-full object-cover">
+                                <% } else { %>
+                                    <div class="text-center text-gray-400">
+                                        <span class="text-6xl">🛍️</span>
+                                        <p class="mt-3 text-sm">Gambar Produk</p>
+                                    </div>
+                                <% } %>
+
+                            </div>
+
+                            <div class="mb-4">
+
+                                <span class="text-sm text-hijau font-semibold">
+                                    <%= item.kategori %>
+                                </span>
+
+                                <h3 class="nama-produk text-xl font-bold mt-2">
+                                    <%= item.nama %>
+                                </h3>
+
+                                <p class="deskripsi-produk text-gray-500 text-sm mt-2">
+                                    <%= item.deskripsi %>
+                                </p>
+
+                                <p class="text-sm text-gray-500 mt-3">
+                                    UMKM: <%= item.umkm %>
+                                </p>
+
+                                <p class="text-xl font-bold text-hijau mt-4">
+                                    Rp <%= Number(item.harga).toLocaleString('id-ID') %>
+                                </p>
+
+                            </div>
+
+                            <button
+                                type="button"
+                                class="tombol-detail w-full bg-hijau text-white py-3 rounded-xl font-semibold hover:bg-hijau-muda transition"
+                                data-nama="<%= item.nama %>"
+                                data-kategori="<%= item.kategori %>"
+                                data-harga="<%= Number(item.harga).toLocaleString('id-ID') %>"
+                                data-deskripsi="<%= item.deskripsi %>"
+                                data-umkm="<%= item.umkm %>">
+                                Lihat Detail
+                            </button>
+
+                        </article>
+
+                    <% }); %>
+
+                <% } else { %>
+
+                    <div class="bg-white rounded-xl p-8 text-center text-gray-500">
+                        Belum ada produk yang tersedia.
+                    </div>
+
+                <% } %>
+
+            </div>
+
+            <p id="pesanKosong" class="hidden text-center text-gray-500 mt-8">
+                Produk tidak ditemukan.
+            </p>
+
+        </section>
+
+        <!-- HALAMAN CHATBOT AI -->
+        <section id="chatbot" class="halaman hidden">
+
+            <h2 class="text-3xl font-bold mb-2">Chatbot AI</h2>
+
+            <p class="text-gray-500 mb-8">
+                Asisten pintar yang siap membantu usaha UMKM Anda!
+            </p>
+
+            <div class="bg-white rounded-2xl shadow-sm p-6 min-h-[500px] flex flex-col">
+
+                <div id="areaChat" class="flex-1 space-y-5 overflow-y-auto">
+
+                    <div class="bg-krem rounded-xl p-5 max-w-xl">
+                        <p class="font-semibold text-hijau mb-2">Asisten AI</p>
+                        <p>
+                            Halo! Ada yang bisa saya bantu untuk mengembangkan usahamu?
+                        </p>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button type="button"
+                            onclick="isiPertanyaan('Bagaimana cara promosi produk?')"
+                            class="bg-gray-100 border rounded-xl p-4 text-left hover:bg-gray-200">
+                            Bagaimana cara promosi produk?
+                        </button>
+                    </div>
+
+                </div>
+
+                <form id="formChat" class="flex gap-3 mt-8">
+
+                    <input
+                        type="text"
+                        id="inputChat"
+                        placeholder="Tulis pertanyaanmu....."
+                        required
+                        class="flex-1 min-w-0 border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-hijau">
+
+                    <button
+                        type="submit"
+                        class="bg-hijau text-white px-6 rounded-xl font-semibold hover:bg-hijau-muda">
+                        Kirim
+                    </button>
+
+                </form>
+
+                <p class="text-xs text-gray-400 mt-3">
+                    Demo tampilan chatbot. Belum terhubung dengan layanan AI.
+                </p>
+
+            </div>
+
+        </section>
+
+        <!-- HALAMAN FORM PENDAFTARAN -->
+        <section id="pendaftaran" class="halaman hidden">
+
+            <h2 class="text-3xl font-bold mb-2">
+                Form Pendaftaran UMKM
+            </h2>
+
+            <p class="text-gray-500 mb-8">
+                Isi data untuk bergabung
+            </p>
+
+            <form id="formPendaftaran"
+                class="bg-white rounded-2xl p-6 md:p-8 shadow-sm space-y-6">
+
+                <div>
+                    <label for="namaLengkap" class="block font-semibold mb-2">
+                        Nama Lengkap
+                    </label>
+
+                    <input
+                        id="namaLengkap"
+                        type="text"
+                        placeholder="Contoh: Siti Aminah"
+                        required
+                        class="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-hijau">
+                </div>
+
+                <div>
+                    <label for="email" class="block font-semibold mb-2">
+                        Email
+                    </label>
+
+                    <input
+                        id="email"
+                        type="email"
+                        placeholder="nama@email.com"
+                        required
+                        class="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-hijau">
+                </div>
+
+                <div>
+                    <label for="namaUsaha" class="block font-semibold mb-2">
+                        Nama UMKM / Usaha
+                    </label>
+
+                    <input
+                        id="namaUsaha"
+                        type="text"
+                        placeholder="Contoh: Keripik Singkong Mak Nyus"
+                        required
+                        class="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-hijau">
+                </div>
+
+                <div>
+                    <label for="kategoriUsaha" class="block font-semibold mb-2">
+                        Kategori Usaha
+                    </label>
+
+                    <select
+                        id="kategoriUsaha"
+                        required
+                        class="w-full border rounded-xl px-4 py-3 bg-white outline-none focus:ring-2 focus:ring-hijau">
+
+                        <option value="">Pilih Kategori</option>
+                        <option>Makanan & Minuman</option>
+                        <option>Kerajinan</option>
+                        <option>Fashion</option>
+                        <option>Pertanian</option>
+                        <option>Lainnya</option>
+
+                    </select>
+                </div>
+
+                <div>
+                    <label for="fotoUsaha" class="block font-semibold mb-2">
+                        Foto UMKM / Produk
+                    </label>
+
+                    <label class="block border-2 border-dashed rounded-xl p-10 text-center cursor-pointer hover:bg-krem">
+
+                        <input
+                            id="fotoUsaha"
+                            type="file"
+                            accept="image/png,image/jpeg"
+                            class="hidden">
+
+                        <p class="font-semibold text-hijau">
+                            Tarik foto ke sini atau pilih file
+                        </p>
+
+                        <p class="text-sm text-gray-500 mt-2">
+                            JPG atau PNG, maksimal 2 MB
+                        </p>
+
+                        <p id="namaFile" class="text-sm text-gray-500 mt-3"></p>
+
+                    </label>
+                </div>
+
+                <div>
+                    <label for="keterangan" class="block font-semibold mb-2">
+                        Pesan / Keterangan
+                    </label>
+
+                    <textarea
+                        id="keterangan"
+                        rows="4"
+                        placeholder="Ceritakan singkat usaha Anda"
+                        class="w-full border rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-hijau"></textarea>
+                </div>
+
+                <p id="pesanForm" class="text-sm hidden"></p>
+
+                <button
+                    type="submit"
+                    class="w-full bg-hijau text-white py-3 rounded-xl font-semibold hover:bg-hijau-muda transition">
+                    Kirim Data
+                </button>
+            </form>
+        </section>
+
+        <!-- HALAMAN AKUN SAYA -->
+        <section id="akun" class="halaman hidden">
+
+            <h2 class="text-3xl font-bold mb-2">Akun Saya</h2>
+
+            <p class="text-gray-500 mb-8">
+                Kelola informasi akun Anda
+            </p>
+
+            <section class="bg-white rounded-2xl p-8 shadow-sm">
+
+                <div class="flex flex-col sm:flex-row items-center gap-5 mb-8">
+
+                    <div class="w-24 h-24 rounded-full bg-hijau text-white flex items-center justify-center text-4xl font-bold">
+                        K
+                    </div>
+
+                    <div class="text-center sm:text-left">
+                        <h3 class="text-2xl font-bold">Kelompok Dua</h3>
+                        <p class="text-gray-500">Pemilik UMKM</p>
+                    </div>
+
+                </div>
+
+                <button
+                    id="tombolEdit"
+                    type="button"
+                    class="bg-hijau text-white px-6 py-3 rounded-xl font-semibold hover:bg-hijau-muda mb-8">
+                    Edit Profil
+                </button>
+
+                <div class="border-t pt-6">
+
+                    <h3 class="text-xl font-bold mb-6">Informasi akun</h3>
+
+                    <div class="space-y-5">
+
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Nama lengkap</p>
+                            <input
+                                id="akunNama"
+                                type="text"
+                                value="Kelompok Dua"
+                                disabled
+                                class="w-full bg-gray-50 border rounded-lg px-4 py-3 font-semibold">
+                        </div>
+
+                        <div>
+                            <p class="text-sm text-gray-500 mb-1">Nama usaha UMKM</p>
+                            <input
+                                id="akunUsaha"
+                                type="text"
+                                value="Sambal Kemasan"
+                                disabled
+                                class="w-full bg-gray-50 border rounded-lg px-4 py-3 font-semibold">
+                        </div>
+                    </div>
+                    <p id="pesanAkun" class="text-sm text-green-700 mt-4 hidden">
+                        Profil berhasil diperbarui pada tampilan ini.
+                    </p>
+                </div>
+            </section>
+        </section>
+    </main>
+</div>
+
+<!-- MODAL DETAIL PRODUK -->
+<div id="modalDetail"
+    class="hidden fixed inset-0 bg-black/50 z-50 items-center justify-center p-4">
+
+    <div class="bg-white rounded-2xl p-7 max-w-lg w-full">
+
+        <div class="flex justify-between items-center mb-5">
+            <h3 class="text-xl font-bold">Detail Produk</h3>
+
+            <button id="tutupModal"
+                type="button"
+                class="text-2xl text-gray-500 hover:text-red-500">
+                &times;
+            </button>
+        </div>
+
+        <p class="text-sm text-hijau font-semibold" id="detailKategori"></p>
+
+        <h4 class="text-2xl font-bold mt-2" id="detailNama"></h4>
+
+        <p class="text-gray-500 mt-4" id="detailDeskripsi"></p>
+
+        <p class="text-sm text-gray-500 mt-4">
+            UMKM: <span id="detailUmkm"></span>
+        </p>
+
+        <p class="text-xl font-bold text-hijau mt-4">
+            Rp <span id="detailHarga"></span>
+        </p>
+
+        <button id="tutupModalBawah"
+            type="button"
+            class="w-full bg-hijau text-white py-3 rounded-xl mt-6">
+            Tutup
+        </button>
+    </div>
+</div>
+
+<!-- JAVASCRIPT -->
+<script>
+
+// PINDAH HALAMAN
+function tampilkanHalaman(id) {
+
+    document.querySelectorAll('.halaman').forEach(halaman => {
+        halaman.classList.add('hidden');
+    });
+
+    const halamanTujuan = document.getElementById(id);
+
+    if (halamanTujuan) {
+        halamanTujuan.classList.remove('hidden');
+    }
+
+    // Mengubah menu aktif
+    document.querySelectorAll('.menu-link').forEach(menu => {
+
+        menu.classList.remove('bg-hijau-muda', 'font-semibold');
+
+        if (menu.dataset.halaman === id) {
+            menu.classList.add('bg-hijau-muda', 'font-semibold');
+        }
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// CEK STATUS SERVER
+fetch('/api/status')
+    .then(response => {
+        if (!response.ok) throw new Error('Server error');
+        return response.json();
+    })
+    .then(data => {
+
+        document.getElementById('status-dot').classList.replace(
+            'bg-gray-400',
+            'bg-green-500'
+        );
+        document.getElementById('status-label').textContent =
+            'Server terhubung';
+    })
+    .catch(() => {
+        document.getElementById('status-dot').classList.replace(
+            'bg-gray-400',
+            'bg-red-500'
+        );
+        document.getElementById('status-label').textContent =
+            'Server tidak terhubung';
+    });
+
+// PENCARIAN PRODUK
+const searchProduk = document.getElementById('searchProduk');
+const produkCards = document.querySelectorAll('.produk-card');
+const pesanKosong = document.getElementById('pesanKosong');
+
+searchProduk.addEventListener('input', function() {
+
+    const keyword = this.value.toLowerCase();
+    let jumlahTampil = 0;
+
+    produkCards.forEach(card => {
+
+        const nama = card.querySelector('.nama-produk').textContent.toLowerCase();
+        const deskripsi = card.querySelector('.deskripsi-produk').textContent.toLowerCase();
+
+        if (nama.includes(keyword) || deskripsi.includes(keyword)) {
+            card.classList.remove('hidden');
+            jumlahTampil++;
+        } else {
+            card.classList.add('hidden');
+        }
+
+    });
+    pesanKosong.classList.toggle('hidden', jumlahTampil !== 0);
+});
+
+// DETAIL PRODUK
+const modalDetail = document.getElementById('modalDetail');
+
+function tutupDetail() {
+    modalDetail.classList.add('hidden');
+    modalDetail.classList.remove('flex');
+}
+
+document.querySelectorAll('.tombol-detail').forEach(button => {
+
+    button.addEventListener('click', function() {
+
+        document.getElementById('detailNama').textContent = this.dataset.nama;
+        document.getElementById('detailKategori').textContent = this.dataset.kategori;
+        document.getElementById('detailHarga').textContent = this.dataset.harga;
+        document.getElementById('detailDeskripsi').textContent = this.dataset.deskripsi;
+        document.getElementById('detailUmkm').textContent = this.dataset.umkm;
+
+        modalDetail.classList.remove('hidden');
+        modalDetail.classList.add('flex');
+    });
+});
+
+document.getElementById('tutupModal').addEventListener('click', tutupDetail);
+document.getElementById('tutupModalBawah').addEventListener('click', tutupDetail);
+
+// CHATBOT DEMO
+function isiPertanyaan(teks) {
+    document.getElementById('inputChat').value = teks;
+}
+
+document.getElementById('formChat').addEventListener('submit', function(event) {
+
+    event.preventDefault();
+
+    const input = document.getElementById('inputChat');
+    const areaChat = document.getElementById('areaChat');
+    const pertanyaan = input.value.trim();
+
+    if (!pertanyaan) return;
+
+    const pesanPengguna = document.createElement('div');
+    pesanPengguna.className = 'flex justify-end';
+
+    const isiPengguna = document.createElement('div');
+    isiPengguna.className = 'bg-hijau text-white rounded-xl p-4 max-w-sm';
+    isiPengguna.textContent = pertanyaan;
+
+    pesanPengguna.appendChild(isiPengguna);
+    areaChat.appendChild(pesanPengguna);
+
+    const jawaban = document.createElement('div');
+    jawaban.className = 'bg-krem rounded-xl p-5 max-w-xl mt-4';
+
+    const label = document.createElement('p');
+    label.className = 'font-semibold text-hijau mb-2';
+    label.textContent = 'Asisten AI';
+
+    const isiJawaban = document.createElement('p');
+    isiJawaban.textContent =
+        'Terima kasih atas pertanyaannya! Untuk mengembangkan UMKM, kamu bisa mulai dengan mengenalkan keunggulan produk, menggunakan foto yang menarik, dan mempromosikannya melalui media sosial.';
+
+    jawaban.appendChild(label);
+    jawaban.appendChild(isiJawaban);
+    areaChat.appendChild(jawaban);
+
+    input.value = '';
+    areaChat.scrollTop = areaChat.scrollHeight;
+});
+
+// VALIDASI FOTO PENDAFTARAN
+const fotoUsaha = document.getElementById('fotoUsaha');
+
+fotoUsaha.addEventListener('change', function() {
+
+    const file = this.files[0];
+    const namaFile = document.getElementById('namaFile');
+
+    if (!file) {
+        namaFile.textContent = '';
+        return;
+    }
+
+    if (!['image/jpeg', 'image/png'].includes(file.type)) {
+        alert('File harus berupa JPG atau PNG.');
+        this.value = '';
+        namaFile.textContent = '';
+        return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+        alert('Ukuran foto maksimal 2 MB.');
+        this.value = '';
+        namaFile.textContent = '';
+        return;
+    }
+    namaFile.textContent = 'File dipilih: ' + file.name;
+});
+
+// FORM PENDAFTARAN DEMO
+document.getElementById('formPendaftaran').addEventListener('submit', function(event) {
+
+    event.preventDefault();
+
+    const pesan = document.getElementById('pesanForm');
+
+    pesan.textContent =
+        'Data berhasil diperiksa. Form ini belum terhubung ke penyimpanan server.';
+
+    pesan.classList.remove('hidden');
+    pesan.classList.remove('text-red-600');
+    pesan.classList.add('text-green-700');
+
+});
+
+// EDIT PROFIL DEMO
+let modeEdit = false;
+
+document.getElementById('tombolEdit').addEventListener('click', function() {
+
+    const nama = document.getElementById('akunNama');
+    const usaha = document.getElementById('akunUsaha');
+    const pesan = document.getElementById('pesanAkun');
+
+    modeEdit = !modeEdit;
+
+    nama.disabled = !modeEdit;
+    usaha.disabled = !modeEdit;
+
+    nama.classList.toggle('bg-gray-50', !modeEdit);
+    usaha.classList.toggle('bg-gray-50', !modeEdit);
+
+    if (modeEdit) {
+
+        this.textContent = 'Simpan Perubahan';
+        pesan.classList.add('hidden');
+
+        nama.focus();
+
+    } else {
+        this.textContent = 'Edit Profil';
+        pesan.classList.remove('hidden');
+    }
+
+});
+</script>
+
+<%- include('partials/footer') %>
+</body>
+</html>
