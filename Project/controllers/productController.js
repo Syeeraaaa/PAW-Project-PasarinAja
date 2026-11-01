@@ -18,7 +18,7 @@ const getStatus = (req, res) => {
 };
 
 const getApiProducts = (req, res) => {
-  res.status(200).json(Model.getAll());
+  res.status(200).json(produkModel.getAll());
 };
 
 module.exports = { renderHomePage, getStatus, getApiProducts };
