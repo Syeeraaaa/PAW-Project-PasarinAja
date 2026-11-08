@@ -1,0 +1,49 @@
+<%- include('partials/head', { appName: appName }) %>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <div class="min-h-screen flex flex-col md:flex-row">
+        <!-- Sidebar -->
+        <aside class="w-full md:w-72 bg-primary text-white p-6 flex flex-col justify-between">
+            <div>
+                <h1 class="text-xl font-extrabold tracking-wide mb-10">PASEBAN KAWIS</h1>
+                <nav class="space-y-4">
+                    <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-house"></i> Dashboard</a>
+                    <a href="/katalog" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-900 font-bold text-lg"><i class="fa-solid fa-basket-shopping"></i> E-Katalog</a>
+                    <a href="/chatbot" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-robot"></i> Chatbot AI</a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8 md:p-12">
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-1">E-Katalog</h2>
+            <p class="text-gray-600 text-base mb-6">Daftar produk UMKM</p>
+
+            <!-- Search Bar -->
+            <div class="relative max-w-4xl mb-8">
+                <input type="text" placeholder="Cari produk....." class="w-full bg-gray-100 border-0 rounded-xl px-5 py-4 pl-5 pr-12 text-base focus:ring-2 focus:ring-primary">
+                <i class="fa-solid fa-magnifying-glass absolute right-5 top-4 text-gray-400 text-xl"></i>
+            </div>
+
+            <!-- Product Card List -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200 max-w-4xl">
+                <div class="bg-amber-50/50 rounded-2xl p-4 mb-4 text-center">
+                    <div class="flex justify-center gap-4 mb-2">
+                        <img src="/images/sambal1.jpg" alt="Sambal" class="w-24 h-24 object-cover rounded-xl">
+                        <img src="/images/sambal2.jpg" alt="Sambal" class="w-24 h-24 object-cover rounded-xl">
+                        <img src="/images/sambal3.jpg" alt="Sambal" class="w-24 h-24 object-cover rounded-xl">
+                    </div>
+                    <span class="text-sm font-medium text-gray-600">Pilih favoritku! ♡</span>
+                </div>
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-800">Sambal kemasan</h4>
+                        <span class="text-lg font-bold text-primary">Rp 35.000</span>
+                    </div>
+                </div>
+                <a href="/katalog/detail/1" class="block w-full bg-primary text-white text-center font-bold py-3.5 rounded-xl hover:bg-emerald-900 transition">
+                    Lihat Detail
+                </a>
+            </div>
+        </main>
+    </div>
+<%- include('partials/footer') %>
