@@ -1,0 +1,81 @@
+<%- include('partials/head', { appName: appName }) %>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <div class="min-h-screen flex flex-col md:flex-row">
+        <!-- Sidebar Admin -->
+        <aside class="w-full md:w-72 bg-primary text-white p-6 flex flex-col justify-between">
+            <div>
+                <h1 class="text-xl font-extrabold tracking-wide mb-10">PASEBAN KAWIS</h1>
+                <nav class="space-y-3">
+                    <a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-900 font-bold text-lg"><i class="fa-solid fa-house"></i> Dashboard</a>
+                    <a href="/admin/umkm" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-store"></i> Data UMKM</a>
+                    <a href="/admin/produk" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-box"></i> Data Produk</a>
+                </nav>
+            </div>
+            <div class="pt-6 border-t border-emerald-800">
+                <a href="/admin/akun" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-user"></i> Akun Saya</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8 md:p-12">
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-1">Dashboard Admin</h2>
+            <p class="text-gray-600 text-lg mb-8">Selamat datang kembali Admin!!</p>
+
+            <!-- Statistik Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                <div class="bg-emerald-50 border border-emerald-100 rounded-3xl p-6 shadow-sm">
+                    <span class="text-gray-600 font-bold block text-sm">Total UMKM</span>
+                    <h3 class="text-4xl font-extrabold text-gray-900 mt-2">1</h3>
+                </div>
+                <div class="bg-blue-50 border border-blue-100 rounded-3xl p-6 shadow-sm">
+                    <span class="text-gray-600 font-bold block text-sm">Total Produk</span>
+                    <h3 class="text-4xl font-extrabold text-gray-900 mt-2">2</h3>
+                </div>
+                <div class="bg-amber-50 border border-amber-100 rounded-3xl p-6 shadow-sm">
+                    <span class="text-gray-600 font-bold block text-sm">Menunggu verifikasi</span>
+                    <h3 class="text-4xl font-extrabold text-gray-900 mt-2">1</h3>
+                </div>
+                <div class="bg-purple-50 border border-purple-100 rounded-3xl p-6 shadow-sm">
+                    <span class="text-gray-600 font-bold block text-sm">Terverifikasi</span>
+                    <h3 class="text-4xl font-extrabold text-gray-900 mt-2">2</h3>
+                </div>
+            </div>
+
+            <!-- Daftar Pendaftar Terbaru -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200 max-w-5xl space-y-6">
+                <h3 class="text-2xl font-bold text-gray-800">Pendaftar Terbaru</h3>
+
+                <!-- Item 1: Menunggu -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 gap-4">
+                    <div class="flex items-center gap-4">
+                        <img src="/images/singkong.jpg" alt="Produk" class="w-16 h-16 object-cover rounded-xl">
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-800">Keripik Singkong</h4>
+                            <p class="text-sm text-gray-500">Kategori: Makanan</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1.5 rounded-full">Menunggu</span>
+                        <a href="/admin/umkm/verifikasi/1" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-4 py-2 rounded-xl text-sm transition">Verifikasi</a>
+                        <a href="/admin/umkm/detail/1" class="bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-bold px-4 py-2 rounded-xl text-sm transition">Detail</a>
+                    </div>
+                </div>
+
+                <!-- Item 2: Disetujui -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 gap-4">
+                    <div class="flex items-center gap-4">
+                        <img src="/images/seblak.jpg" alt="Produk" class="w-16 h-16 object-cover rounded-xl">
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-800">Kerupuk Seblak Campur</h4>
+                            <p class="text-sm text-gray-500">Kategori: Makanan</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                        <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-full">Disetujui</span>
+                        <a href="/admin/umkm/detail/2" class="bg-white border border-gray-300 hover:bg-gray-100 text-gray-700 font-bold px-4 py-2 rounded-xl text-sm transition">Detail</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+<%- include('partials/footer') %>
