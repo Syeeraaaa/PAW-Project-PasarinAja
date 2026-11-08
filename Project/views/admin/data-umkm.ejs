@@ -1,0 +1,75 @@
+<%- include('partials/head', { appName: appName }) %>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <div class="min-h-screen flex flex-col md:flex-row">
+        <!-- Sidebar Admin -->
+        <aside class="w-full md:w-72 bg-primary text-white p-6 flex flex-col justify-between">
+            <div>
+                <h1 class="text-xl font-extrabold tracking-wide mb-10">PASEBAN KAWIS</h1>
+                <nav class="space-y-3">
+                    <a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-house"></i> Dashboard</a>
+                    <a href="/admin/umkm" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-900 font-bold text-lg"><i class="fa-solid fa-store"></i> Data UMKM</a>
+                    <a href="/admin/produk" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-box"></i> Data Produk</a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8 md:p-12">
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-1">Data UMKM</h2>
+            <p class="text-gray-600 text-base mb-6">Kelola seluruh data pelaku UMKM Desa Paseban Kawis.</p>
+
+            <!-- Search & Filter Bar -->
+            <div class="flex flex-col md:flex-row items-stretch md:items-center gap-4 mb-6 max-w-5xl">
+                <a href="/admin/umkm/tambah" class="bg-primary text-white font-bold px-6 py-3.5 rounded-2xl hover:bg-emerald-900 transition shadow-sm text-center">
+                    + Tambah UMKM
+                </a>
+                <div class="relative flex-1">
+                    <input type="text" placeholder="Cari UMKM....." class="w-full bg-gray-100 border-0 rounded-2xl px-5 py-3.5 pl-5 pr-12 text-base focus:ring-2 focus:ring-primary">
+                    <i class="fa-solid fa-magnifying-glass absolute right-5 top-4 text-gray-400 text-lg"></i>
+                </div>
+            </div>
+
+            <!-- Filter Status Badges -->
+            <div class="flex gap-3 mb-6">
+                <button class="bg-amber-100 text-amber-900 font-bold px-5 py-2 rounded-xl text-sm shadow-sm">Semua</button>
+                <button class="bg-emerald-100 text-emerald-900 font-medium px-5 py-2 rounded-xl text-sm hover:bg-emerald-200 transition">Menunggu</button>
+                <button class="bg-rose-100 text-rose-900 font-medium px-5 py-2 rounded-xl text-sm hover:bg-rose-200 transition">Ditolak</button>
+            </div>
+
+            <!-- List Data UMKM -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200 max-w-5xl space-y-4">
+                <!-- Row 1 -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 gap-4">
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-800">Keripik Singkong</h4>
+                        <p class="text-sm text-gray-500">Sekar - Makanan</p>
+                    </div>
+                    <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full">Menunggu</span>
+                        <div class="text-sm font-semibold space-x-2">
+                            <a href="/admin/umkm/detail/1" class="text-emerald-700 hover:underline">Detail</a> |
+                            <a href="/admin/umkm/edit/1" class="text-amber-600 hover:underline">Edit</a> |
+                            <a href="/admin/umkm/hapus/1" class="text-rose-700 hover:underline">Hapus</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 gap-4">
+                    <div>
+                        <h4 class="text-xl font-bold text-gray-800">Kerupuk Seblak Campur</h4>
+                        <p class="text-sm text-gray-500">Shafa - Makanan</p>
+                    </div>
+                    <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                        <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">Disetujui</span>
+                        <div class="text-sm font-semibold space-x-2">
+                            <a href="/admin/umkm/detail/2" class="text-emerald-700 hover:underline">Detail</a> |
+                            <a href="/admin/umkm/edit/2" class="text-amber-600 hover:underline">Edit</a> |
+                            <a href="/admin/umkm/hapus/2" class="text-rose-700 hover:underline">Hapus</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+<%- include('partials/footer') %>
