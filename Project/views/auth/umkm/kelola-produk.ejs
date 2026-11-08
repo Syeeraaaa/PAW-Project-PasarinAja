@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Produk - Paseban Kawis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = { theme: { extend: { colors: { primary: '#065F46' } } } }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <div class="min-h-screen flex flex-col md:flex-row">
+        <!-- Sidebar -->
+        <aside class="w-full md:w-72 bg-primary text-white p-6 flex flex-col justify-between">
+            <div>
+                <h1 class="text-xl font-extrabold tracking-wide mb-10">PASEBAN KAWIS</h1>
+                <nav class="space-y-3">
+                    <a href="/umkm/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-house"></i> Dashboard</a>
+                    <a href="/umkm/katalog" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-basket-shopping"></i> E-Katalog</a>
+                    <a href="/umkm/produk" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-900 font-bold text-lg"><i class="fa-solid fa-box"></i> Kelola Produk</a>
+                    <a href="/umkm/chatbot" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-robot"></i> Chatbot AI</a>
+                    <a href="/umkm/pendaftaran" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-file-pen"></i> Form Pendaftaran</a>
+                </nav>
+            </div>
+            <div class="pt-6 border-t border-emerald-800">
+                <a href="/umkm/akun" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-user"></i> Akun Saya</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8 md:p-12">
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-1">Kelola Produk</h2>
+            <p class="text-gray-600 text-base mb-6">Kelola Produk UMKM Anda di sini</p>
+
+            <!-- Tombol Tambah Produk (Create) -->
+            <a href="/umkm/produk/tambah" class="inline-block bg-primary text-white font-bold px-6 py-4 rounded-xl hover:bg-emerald-900 transition shadow-md mb-8">
+                + TAMBAH PRODUK
+            </a>
+
+            <!-- Daftar Produk (Read & CRUDS List) -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200 max-w-4xl space-y-6">
+                <h3 class="text-2xl font-bold text-gray-800">Daftar Produk</h3>
+
+                <!-- Item Produk 1 -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 gap-4">
+                    <div class="flex items-center gap-4">
+                        <img src="/images/sambal1.jpg" alt="Produk" class="w-20 h-20 object-cover rounded-xl">
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-800">Sambal kemasan</h4>
+                            <p class="text-primary font-bold">Rp 35.000</p>
+                            <span class="text-sm text-gray-500">Stok: 20</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                        <a href="/umkm/produk/edit/1" class="bg-amber-400 hover:bg-amber-500 text-gray-900 font-bold px-5 py-2.5 rounded-xl transition shadow-sm text-center">Edit</a>
+                        <form action="/umkm/produk/hapus/1" method="POST" onsubmit="return confirm('Yakin ingin menghapus produk ini?');">
+                            <button type="submit" class="bg-red-800 hover:bg-red-900 text-white font-bold px-5 py-2.5 rounded-xl transition shadow-sm">Hapus</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Item Produk 2 -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 gap-4">
+                    <div class="flex items-center gap-4">
+                        <img src="/images/seblak.jpg" alt="Produk" class="w-20 h-20 object-cover rounded-xl">
+                        <div>
+                            <h4 class="text-xl font-bold text-gray-800">Kerupuk Seblak Campur</h4>
+                            <p class="text-primary font-bold">Rp 20.000</p>
+                            <span class="text-sm text-gray-500">Stok: 20</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+                        <a href="/umkm/produk/edit/2" class="bg-amber-400 hover:bg-amber-500 text-gray-900 font-bold px-5 py-2.5 rounded-xl transition shadow-sm text-center">Edit</a>
+                        <form action="/umkm/produk/hapus/2" method="POST" onsubmit="return confirm('Yakin ingin menghapus produk ini?');">
+                            <button type="submit" class="bg-red-800 hover:bg-red-900 text-white font-bold px-5 py-2.5 rounded-xl transition shadow-sm">Hapus</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
