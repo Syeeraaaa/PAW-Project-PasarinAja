@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard UMKM - Paseban Kawis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = { theme: { extend: { colors: { primary: '#065F46' } } } }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <div class="min-h-screen flex flex-col md:flex-row">
+        <!-- Sidebar -->
+        <aside class="w-full md:w-72 bg-primary text-white p-6 flex flex-col justify-between">
+            <div>
+                <h1 class="text-xl font-extrabold tracking-wide mb-10">PASEBAN KAWIS</h1>
+                <nav class="space-y-3">
+                    <a href="/umkm/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-900 font-bold text-lg"><i class="fa-solid fa-house"></i> Dashboard</a>
+                    <a href="/umkm/katalog" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-basket-shopping"></i> E-Katalog</a>
+                    <a href="/umkm/produk" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-box"></i> Kelola Produk</a>
+                    <a href="/umkm/chatbot" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-robot"></i> Chatbot AI</a>
+                    <a href="/umkm/pendaftaran" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-file-pen"></i> Form Pendaftaran</a>
+                </nav>
+            </div>
+            <div class="pt-6 border-t border-emerald-800">
+                <a href="/umkm/akun" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-user"></i> Akun Saya</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8 md:p-12">
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-1">Dashboard</h2>
+            <p class="text-gray-600 text-lg mb-6">Selamat datang kembali!!</p>
+
+            <div class="bg-emerald-50 border-2 border-emerald-100 rounded-2xl p-6 mb-8 shadow-sm">
+                <h3 class="text-xl font-bold text-emerald-900 mb-1">Kelola usaha lebih mudah</h3>
+                <p class="text-emerald-700 text-base">Promosikan produk dan kembangkan UMKM anda!</p>
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Menu Utama</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mb-8">
+                <a href="/umkm/katalog" class="bg-white p-6 rounded-2xl border-2 border-gray-100 hover:border-primary shadow-sm transition block">
+                    <h4 class="text-xl font-bold text-gray-800 mb-1">E-Katalog</h4>
+                    <p class="text-gray-500 text-base">Lihat Produk</p>
+                </a>
+                <a href="/umkm/akun" class="bg-white p-6 rounded-2xl border-2 border-gray-100 hover:border-primary shadow-sm transition block">
+                    <h4 class="text-xl font-bold text-gray-800 mb-1">Akun Saya</h4>
+                    <p class="text-gray-500 text-base">Informasi pemilik akun</p>
+                </a>
+                <a href="/umkm/chatbot" class="bg-white p-6 rounded-2xl border-2 border-gray-100 hover:border-primary shadow-sm transition block">
+                    <h4 class="text-xl font-bold text-gray-800 mb-1">Chatbot AI</h4>
+                    <p class="text-gray-500 text-base">Tanya AI</p>
+                </a>
+                <a href="/umkm/produk" class="bg-white p-6 rounded-2xl border-2 border-gray-100 hover:border-primary shadow-sm transition block">
+                    <h4 class="text-xl font-bold text-gray-800 mb-1">Kelola Produk</h4>
+                    <p class="text-gray-500 text-base">Pengelolaan Produk</p>
+                </a>
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Akses Cepat</h3>
+            <a href="/umkm/pendaftaran" class="bg-white p-6 rounded-2xl border-2 border-gray-100 hover:border-primary shadow-sm transition block max-w-4xl text-center">
+                <h4 class="text-xl font-bold text-gray-800">Form Pendaftaran UMKM</h4>
+            </a>
+        </main>
+    </div>
+</body>
+</html>
