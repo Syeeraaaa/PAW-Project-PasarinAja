@@ -1,75 +1,141 @@
-<%- include('partials/head', { appName: appName }) %>
+<%
+  const badge = { menunggu: 'bg-amber-100 text-amber-700', disetujui: 'bg-emerald-100 text-emerald-700', ditolak: 'bg-red-100 text-red-700' };
+  const label = { menunggu: 'Menunggu', disetujui: 'Disetujui', ditolak: 'Ditolak' };
+  const input = 'w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-700';
+  const chips = [
+    { nilai: '', teks: 'Semua' },
+    { nilai: 'menunggu', teks: 'Menunggu' },
+    { nilai: 'disetujui', teks: 'Disetujui' },
+    { nilai: 'ditolak', teks: 'Ditolak' },
+  ];
+%>
+<%- include('../partials/head', { appName: appName }) %>
 <body class="bg-gray-50 text-gray-800 font-sans">
-    <div class="min-h-screen flex flex-col md:flex-row">
-        <!-- Sidebar Admin -->
-        <aside class="w-full md:w-72 bg-primary text-white p-6 flex flex-col justify-between">
-            <div>
-                <h1 class="text-xl font-extrabold tracking-wide mb-10">PASEBAN KAWIS</h1>
-                <nav class="space-y-3">
-                    <a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-house"></i> Dashboard</a>
-                    <a href="/admin/umkm" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-900 font-bold text-lg"><i class="fa-solid fa-store"></i> Data UMKM</a>
-                    <a href="/admin/produk" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-box"></i> Data Produk</a>
-                </nav>
-            </div>
-        </aside>
+<div class="min-h-screen flex flex-col md:flex-row">
+    <%- include('../partials/admin-sidebar', { aktif: 'umkm' }) %>
 
-        <!-- Main Content -->
-        <main class="flex-1 p-8 md:p-12">
-            <h2 class="text-3xl font-extrabold text-gray-900 mb-1">Data UMKM</h2>
-            <p class="text-gray-600 text-base mb-6">Kelola seluruh data pelaku UMKM Desa Paseban Kawis.</p>
+    <main class="flex-1 p-6 md:p-10">
+        <h2 class="text-3xl font-extrabold text-gray-900">Data UMKM</h2>
+        <p class="text-gray-600 mb-6">Kelola seluruh data pelaku UMKM Desa Paseban Kawis.</p>
 
-            <!-- Search & Filter Bar -->
-            <div class="flex flex-col md:flex-row items-stretch md:items-center gap-4 mb-6 max-w-5xl">
-                <a href="/admin/umkm/tambah" class="bg-primary text-white font-bold px-6 py-3.5 rounded-2xl hover:bg-emerald-900 transition shadow-sm text-center">
-                    + Tambah UMKM
-                </a>
-                <div class="relative flex-1">
-                    <input type="text" placeholder="Cari UMKM....." class="w-full bg-gray-100 border-0 rounded-2xl px-5 py-3.5 pl-5 pr-12 text-base focus:ring-2 focus:ring-primary">
-                    <i class="fa-solid fa-magnifying-glass absolute right-5 top-4 text-gray-400 text-lg"></i>
+        <!-- Tombol tambah + pencarian -->
+        <div class="flex flex-col sm:flex-row gap-3 mb-4">
+            <button type="button" onclick="togglePanel('form-tambah')" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-6 py-3 rounded-xl">+ Tambah UMKM</button>
+            <form method="GET" action="/admin/umkm" class="flex-1 flex gap-2">
+                <input type="hidden" name="status" value="<%= status %>">
+                <input type="text" name="q" value="<%= q %>" placeholder="Cari UMKM....." class="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-700">
+                <button type="submit" class="bg-white border border-gray-200 hover:bg-gray-100 px-4 rounded-xl font-semibold text-emerald-700">Cari</button>
+            </form>
+        </div>
+
+        <!-- Filter status -->
+        <div class="flex flex-wrap gap-2 mb-6">
+            <% chips.forEach(function (c) { %>
+                <a href="/admin/umkm?status=<%= c.nilai %>&q=<%= encodeURIComponent(q) %>"
+                   class="px-4 py-1.5 rounded-full text-sm font-semibold <%= status === c.nilai ? 'bg-emerald-700 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100' %>"><%= c.teks %></a>
+            <% }); %>
+        </div>
+
+        <!-- Form tambah UMKM -->
+        <div id="form-tambah" class="hidden bg-white rounded-2xl border border-gray-200 p-5 mb-6 max-w-5xl">
+            <h3 class="font-bold mb-3">Tambah UMKM Baru</h3>
+            <form method="POST" action="/admin/umkm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input name="nama_pemilik" placeholder="Nama pemilik" required class="<%= input %>">
+                <input name="nama_usaha" placeholder="Nama usaha" required class="<%= input %>">
+                <select name="kategori" required class="<%= input %>">
+                    <% kategori.forEach(function (k) { %><option value="<%= k %>"><%= k %></option><% }); %>
+                </select>
+                <input name="email" type="email" placeholder="Email" class="<%= input %>">
+                <input name="no_whatsapp" placeholder="No. WhatsApp (contoh: 6281234567890)" class="<%= input %>">
+                <textarea name="pesan" placeholder="Keterangan usaha" rows="2" class="<%= input %>"></textarea>
+                <div class="md:col-span-2 flex gap-2">
+                    <button class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-5 py-2 rounded-xl text-sm">Simpan</button>
+                    <button type="button" onclick="togglePanel('form-tambah')" class="border border-gray-300 px-5 py-2 rounded-xl text-sm">Batal</button>
                 </div>
-            </div>
+            </form>
+        </div>
 
-            <!-- Filter Status Badges -->
-            <div class="flex gap-3 mb-6">
-                <button class="bg-amber-100 text-amber-900 font-bold px-5 py-2 rounded-xl text-sm shadow-sm">Semua</button>
-                <button class="bg-emerald-100 text-emerald-900 font-medium px-5 py-2 rounded-xl text-sm hover:bg-emerald-200 transition">Menunggu</button>
-                <button class="bg-rose-100 text-rose-900 font-medium px-5 py-2 rounded-xl text-sm hover:bg-rose-200 transition">Ditolak</button>
-            </div>
+        <!-- Daftar UMKM -->
+        <div class="space-y-3 max-w-5xl">
+            <% if (daftar.length === 0) { %>
+                <p class="text-sm text-gray-500">Tidak ada data UMKM.</p>
+            <% } %>
 
-            <!-- List Data UMKM -->
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200 max-w-5xl space-y-4">
-                <!-- Row 1 -->
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 gap-4">
-                    <div>
-                        <h4 class="text-xl font-bold text-gray-800">Keripik Singkong</h4>
-                        <p class="text-sm text-gray-500">Sekar - Makanan</p>
-                    </div>
-                    <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full">Menunggu</span>
-                        <div class="text-sm font-semibold space-x-2">
-                            <a href="/admin/umkm/detail/1" class="text-emerald-700 hover:underline">Detail</a> |
-                            <a href="/admin/umkm/edit/1" class="text-amber-600 hover:underline">Edit</a> |
-                            <a href="/admin/umkm/hapus/1" class="text-rose-700 hover:underline">Hapus</a>
+            <% daftar.forEach(function (u) { %>
+                <div class="bg-white rounded-2xl border border-gray-200 p-4">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div>
+                            <h4 class="text-lg font-bold"><%= u.nama_usaha %></h4>
+                            <p class="text-sm text-gray-500"><%= u.nama_pemilik %> - <%= u.kategori %></p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3 text-sm">
+                            <span class="<%= badge[u.status] %> text-xs font-bold px-3 py-1.5 rounded-full"><%= label[u.status] %></span>
+
+                            <% if (u.status !== 'disetujui') { %>
+                                <form method="POST" action="/admin/umkm/<%= u.id %>/verifikasi">
+                                    <button class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1.5 rounded-lg">Verifikasi</button>
+                                </form>
+                            <% } %>
+                            <% if (u.status === 'menunggu') { %>
+                                <form method="POST" action="/admin/umkm/<%= u.id %>/tolak">
+                                    <button class="bg-red-100 hover:bg-red-200 text-red-700 font-bold px-3 py-1.5 rounded-lg">Tolak</button>
+                                </form>
+                            <% } %>
+
+                            <button type="button" onclick="togglePanel('detail-<%= u.id %>')" class="text-emerald-700 font-semibold">Detail</button>
+                            <button type="button" onclick="togglePanel('edit-<%= u.id %>')" class="text-amber-600 font-semibold">Edit</button>
+                            <form method="POST" action="/admin/umkm/<%= u.id %>/hapus" onsubmit="return confirm('Hapus UMKM ini?')">
+                                <button class="text-red-700 font-semibold">Hapus</button>
+                            </form>
                         </div>
                     </div>
-                </div>
 
-                <!-- Row 2 -->
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 gap-4">
-                    <div>
-                        <h4 class="text-xl font-bold text-gray-800">Kerupuk Seblak Campur</h4>
-                        <p class="text-sm text-gray-500">Shafa - Makanan</p>
+                    <!-- Panel detail -->
+                    <div id="detail-<%= u.id %>" class="hidden mt-4 pt-4 border-t border-gray-100 text-sm space-y-1">
+                        <p><span class="text-gray-500">Pemilik:</span> <%= u.nama_pemilik %></p>
+                        <p><span class="text-gray-500">Email:</span> <%= u.email || '-' %></p>
+                        <p><span class="text-gray-500">WhatsApp:</span>
+                            <% if (u.no_whatsapp) { %>
+                                <a href="https://wa.me/<%= u.no_whatsapp %>" target="_blank" class="text-emerald-700 underline"><%= u.no_whatsapp %></a>
+                            <% } else { %>-<% } %>
+                        </p>
+                        <p><span class="text-gray-500">Keterangan:</span> <%= u.pesan || '-' %></p>
+                        <p><span class="text-gray-500">Terdaftar:</span> <%= new Date(u.createdAt).toLocaleDateString('id-ID') %></p>
                     </div>
-                    <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                        <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1 rounded-full">Disetujui</span>
-                        <div class="text-sm font-semibold space-x-2">
-                            <a href="/admin/umkm/detail/2" class="text-emerald-700 hover:underline">Detail</a> |
-                            <a href="/admin/umkm/edit/2" class="text-amber-600 hover:underline">Edit</a> |
-                            <a href="/admin/umkm/hapus/2" class="text-rose-700 hover:underline">Hapus</a>
-                        </div>
+
+                    <!-- Panel edit -->
+                    <div id="edit-<%= u.id %>" class="hidden mt-4 pt-4 border-t border-gray-100">
+                        <form method="POST" action="/admin/umkm/<%= u.id %>/edit" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input name="nama_pemilik" value="<%= u.nama_pemilik %>" required class="<%= input %>">
+                            <input name="nama_usaha" value="<%= u.nama_usaha %>" required class="<%= input %>">
+                            <select name="kategori" required class="<%= input %>">
+                                <% kategori.forEach(function (k) { %>
+                                    <option value="<%= k %>" <%= u.kategori === k ? 'selected' : '' %>><%= k %></option>
+                                <% }); %>
+                            </select>
+                            <input name="email" type="email" value="<%= u.email || '' %>" placeholder="Email" class="<%= input %>">
+                            <input name="no_whatsapp" value="<%= u.no_whatsapp || '' %>" placeholder="No. WhatsApp" class="<%= input %>">
+                            <textarea name="pesan" rows="2" placeholder="Keterangan usaha" class="<%= input %>"><%= u.pesan || '' %></textarea>
+                            <div class="md:col-span-2 flex gap-2">
+                                <button class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-5 py-2 rounded-xl text-sm">Simpan Perubahan</button>
+                                <button type="button" onclick="togglePanel('edit-<%= u.id %>')" class="border border-gray-300 px-5 py-2 rounded-xl text-sm">Batal</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-            </div>
-        </main>
-    </div>
-<%- include('partials/footer') %>
+            <% }); %>
+        </div>
+    </main>
+</div>
+
+<script>
+    function togglePanel(id) {
+        document.getElementById(id).classList.toggle('hidden');
+    }
+    // Buka panel otomatis kalau datang dari link #detail-... (misalnya dari dashboard)
+    if (location.hash) {
+        var el = document.getElementById(location.hash.slice(1));
+        if (el) el.classList.remove('hidden');
+    }
+</script>
+<%- include('../partials/footer') %>

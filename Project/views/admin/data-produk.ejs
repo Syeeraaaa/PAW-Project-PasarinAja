@@ -1,98 +1,123 @@
-<%- include('partials/head', { appName: appName }) %>
+<%
+  const badge = { menunggu: 'bg-amber-100 text-amber-700', ditampilkan: 'bg-emerald-100 text-emerald-700', ditolak: 'bg-red-100 text-red-700' };
+  const label = { menunggu: 'Menunggu', ditampilkan: 'Ditampilkan', ditolak: 'Ditolak' };
+  const input = 'w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-700';
+  const chips = [
+    { nilai: '', teks: 'Semua' },
+    { nilai: 'menunggu', teks: 'Menunggu' },
+    { nilai: 'ditampilkan', teks: 'Ditampilkan' },
+    { nilai: 'ditolak', teks: 'Ditolak' },
+  ];
+%>
+<%- include('../partials/head', { appName: appName }) %>
 <body class="bg-gray-50 text-gray-800 font-sans">
-    <div class="min-h-screen flex flex-col md:flex-row">
-        <!-- Sidebar Admin -->
-        <aside class="w-full md:w-72 bg-primary text-white p-6 flex flex-col justify-between">
-            <div>
-                <h1 class="text-xl font-extrabold tracking-wide mb-10">PASEBAN KAWIS</h1>
-                <nav class="space-y-3">
-                    <a href="/admin/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-house"></i> Dashboard</a>
-                    <a href="/admin/umkm" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-store"></i> Data UMKM</a>
-                    <a href="/admin/produk" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-900 font-bold text-lg"><i class="fa-solid fa-box"></i> Data Produk</a>
-                </nav>
-            </div>
-        </aside>
+<div class="min-h-screen flex flex-col md:flex-row">
+    <%- include('../partials/admin-sidebar', { aktif: 'produk' }) %>
 
-        <!-- Main Content -->
-        <main class="flex-1 p-8 md:p-12">
-            <h2 class="text-3xl font-extrabold text-gray-900 mb-1">Data Produk</h2>
-            <p class="text-gray-600 text-base mb-6">Kelola seluruh data pelaku UMKM Desa Paseban Kawis.</p>
+    <main class="flex-1 p-6 md:p-10">
+        <h2 class="text-3xl font-extrabold text-gray-900">Data Produk</h2>
+        <p class="text-gray-600 mb-6">Kelola seluruh data produk UMKM Desa Paseban Kawis.</p>
 
-            <!-- Search Bar -->
-            <div class="relative max-w-5xl mb-6">
-                <input type="text" placeholder="Cari Produk....." class="w-full bg-gray-100 border-0 rounded-2xl px-5 py-3.5 pl-5 pr-12 text-base focus:ring-2 focus:ring-primary">
-                <i class="fa-solid fa-magnifying-glass absolute right-5 top-4 text-gray-400 text-lg"></i>
-            </div>
+        <!-- Pencarian -->
+        <form method="GET" action="/admin/produk" class="flex gap-2 mb-4 max-w-5xl">
+            <input type="hidden" name="status" value="<%= status %>">
+            <input type="text" name="q" value="<%= q %>" placeholder="Cari Produk..." class="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-700">
+            <button type="submit" class="bg-white border border-gray-200 hover:bg-gray-100 px-5 rounded-xl font-semibold text-emerald-700">Cari</button>
+        </form>
 
-            <!-- Filter Badges -->
-            <div class="flex gap-3 mb-6">
-                <button class="bg-amber-100 text-amber-900 font-bold px-5 py-2 rounded-xl text-sm shadow-sm">Semua</button>
-                <button class="bg-emerald-100 text-emerald-900 font-medium px-5 py-2 rounded-xl text-sm hover:bg-emerald-200 transition">Menunggu</button>
-                <button class="bg-rose-100 text-rose-900 font-medium px-5 py-2 rounded-xl text-sm hover:bg-rose-200 transition">Ditolak</button>
-            </div>
+        <!-- Filter status -->
+        <div class="flex flex-wrap gap-2 mb-6">
+            <% chips.forEach(function (c) { %>
+                <a href="/admin/produk?status=<%= c.nilai %>&q=<%= encodeURIComponent(q) %>"
+                   class="px-4 py-1.5 rounded-full text-sm font-semibold <%= status === c.nilai ? 'bg-emerald-700 text-white' : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-100' %>"><%= c.teks %></a>
+            <% }); %>
+        </div>
 
-            <!-- List Data Produk -->
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200 max-w-5xl space-y-4">
-                <!-- Produk 1 -->
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 gap-4">
-                    <div class="flex items-center gap-4">
-                        <img src="/images/singkong.jpg" alt="Produk" class="w-16 h-16 object-cover rounded-xl">
-                        <div>
-                            <h4 class="text-xl font-bold text-gray-800">Keripik Singkong</h4>
-                            <p class="text-sm text-gray-500">Sekar - Makanan</p>
-                            <span class="text-sm font-bold text-primary">Rp 15.000 | Stok: 10</span>
+        <!-- Daftar produk -->
+        <div class="space-y-3 max-w-5xl">
+            <% if (daftar.length === 0) { %>
+                <p class="text-sm text-gray-500">Tidak ada produk.</p>
+            <% } %>
+
+            <% daftar.forEach(function (p) { %>
+                <div class="bg-white rounded-2xl border border-gray-200 p-4">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                        <div class="flex items-center gap-4">
+                            <div class="relative w-16 h-16 shrink-0 rounded-xl bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center overflow-hidden">
+                                <span><%= p.nama.charAt(0).toUpperCase() %></span>
+                                <% if (p.gambar) { %>
+                                    <img src="<%= p.gambar %>" alt="" class="absolute inset-0 w-full h-full object-cover" onerror="this.remove()">
+                                <% } %>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold"><%= p.nama %></h4>
+                                <p class="text-sm text-gray-500"><%= p.umkm || '-' %> - <%= p.kategori %></p>
+                                <p class="text-sm font-semibold"><%= formatRupiah(p.harga) %> <span class="text-gray-400">|</span> Stok: <%= p.stok %></p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3 text-sm">
+                            <span class="<%= badge[p.status] %> text-xs font-bold px-3 py-1.5 rounded-full"><%= label[p.status] %></span>
+
+                            <% if (p.status !== 'ditampilkan') { %>
+                                <form method="POST" action="/admin/produk/<%= p.id %>/verifikasi">
+                                    <button class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1.5 rounded-lg">Verifikasi</button>
+                                </form>
+                            <% } %>
+                            <% if (p.status === 'menunggu') { %>
+                                <form method="POST" action="/admin/produk/<%= p.id %>/tolak">
+                                    <button class="bg-red-100 hover:bg-red-200 text-red-700 font-bold px-3 py-1.5 rounded-lg">Tolak</button>
+                                </form>
+                            <% } %>
+
+                            <button type="button" onclick="togglePanel('detail-<%= p.id %>')" class="text-emerald-700 font-semibold">Detail</button>
+                            <button type="button" onclick="togglePanel('edit-<%= p.id %>')" class="text-amber-600 font-semibold">Edit</button>
+                            <form method="POST" action="/admin/produk/<%= p.id %>/hapus" onsubmit="return confirm('Hapus produk ini?')">
+                                <button class="text-red-700 font-semibold">Hapus</button>
+                            </form>
                         </div>
                     </div>
-                    <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1.5 rounded-full">Menunggu</span>
-                        <div class="text-sm font-semibold space-x-2">
-                            <a href="/admin/produk/detail/1" class="text-emerald-700 hover:underline">Detail</a> |
-                            <a href="/admin/produk/edit/1" class="text-amber-600 hover:underline">Edit</a> |
-                            <a href="/admin/produk/hapus/1" class="text-rose-700 hover:underline">Hapus</a>
-                        </div>
+
+                    <!-- Panel detail -->
+                    <div id="detail-<%= p.id %>" class="hidden mt-4 pt-4 border-t border-gray-100 text-sm space-y-1">
+                        <p><span class="text-gray-500">Deskripsi:</span> <%= p.deskripsi || '-' %></p>
+                        <p><span class="text-gray-500">UMKM:</span> <%= p.umkm || '-' %></p>
+                        <p><span class="text-gray-500">WhatsApp:</span>
+                            <% if (p.no_whatsapp) { %>
+                                <a href="https://wa.me/<%= p.no_whatsapp %>" target="_blank" class="text-emerald-700 underline"><%= p.no_whatsapp %></a>
+                            <% } else { %>-<% } %>
+                        </p>
+                    </div>
+
+                    <!-- Panel edit -->
+                    <div id="edit-<%= p.id %>" class="hidden mt-4 pt-4 border-t border-gray-100">
+                        <form method="POST" action="/admin/produk/<%= p.id %>/edit" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input name="nama" value="<%= p.nama %>" placeholder="Nama produk" required class="<%= input %>">
+                            <select name="kategori" required class="<%= input %>">
+                                <% kategori.forEach(function (k) { %>
+                                    <option value="<%= k %>" <%= p.kategori === k ? 'selected' : '' %>><%= k %></option>
+                                <% }); %>
+                            </select>
+                            <input name="harga" type="number" min="0" value="<%= p.harga %>" placeholder="Harga" required class="<%= input %>">
+                            <input name="stok" type="number" min="0" value="<%= p.stok %>" placeholder="Stok" required class="<%= input %>">
+                            <input name="umkm" value="<%= p.umkm || '' %>" placeholder="Nama UMKM" class="<%= input %>">
+                            <input name="no_whatsapp" value="<%= p.no_whatsapp || '' %>" placeholder="No. WhatsApp" class="<%= input %>">
+                            <input name="gambar" value="<%= p.gambar || '' %>" placeholder="Path gambar (contoh: /images/singkong.jpg)" class="<%= input %> md:col-span-2">
+                            <textarea name="deskripsi" rows="3" placeholder="Deskripsi" class="<%= input %> md:col-span-2"><%= p.deskripsi || '' %></textarea>
+                            <div class="md:col-span-2 flex gap-2">
+                                <button class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-5 py-2 rounded-xl text-sm">Simpan Perubahan</button>
+                                <button type="button" onclick="togglePanel('edit-<%= p.id %>')" class="border border-gray-300 px-5 py-2 rounded-xl text-sm">Batal</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
+            <% }); %>
+        </div>
+    </main>
+</div>
 
-                <!-- Produk 2 -->
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 gap-4">
-                    <div class="flex items-center gap-4">
-                        <img src="/images/seblak.jpg" alt="Produk" class="w-16 h-16 object-cover rounded-xl">
-                        <div>
-                            <h4 class="text-xl font-bold text-gray-800">Kerupuk Seblak Campur</h4>
-                            <p class="text-sm text-gray-500">Shafa - Makanan</p>
-                            <span class="text-sm font-bold text-primary">Rp 20.000 | Stok: 20</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                        <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-full">Ditampilkan</span>
-                        <div class="text-sm font-semibold space-x-2">
-                            <a href="/admin/produk/detail/2" class="text-emerald-700 hover:underline">Detail</a> |
-                            <a href="/admin/produk/edit/2" class="text-amber-600 hover:underline">Edit</a> |
-                            <a href="/admin/produk/hapus/2" class="text-rose-700 hover:underline">Hapus</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Produk 3 -->
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 gap-4">
-                    <div class="flex items-center gap-4">
-                        <img src="/images/sambal1.jpg" alt="Produk" class="w-16 h-16 object-cover rounded-xl">
-                        <div>
-                            <h4 class="text-xl font-bold text-gray-800">Sambal kemasan</h4>
-                            <p class="text-sm text-gray-500">Sekar - Makanan</p>
-                            <span class="text-sm font-bold text-primary">Rp 35.000 | Stok: 20</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                        <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-3 py-1.5 rounded-full">Ditampilkan</span>
-                        <div class="text-sm font-semibold space-x-2">
-                            <a href="/admin/produk/detail/3" class="text-emerald-700 hover:underline">Detail</a> |
-                            <a href="/admin/produk/edit/3" class="text-amber-600 hover:underline">Edit</a> |
-                            <a href="/admin/produk/hapus/3" class="text-rose-700 hover:underline">Hapus</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-<%- include('partials/footer') %>
+<script>
+    function togglePanel(id) {
+        document.getElementById(id).classList.toggle('hidden');
+    }
+</script>
+<%- include('../partials/footer') %>
