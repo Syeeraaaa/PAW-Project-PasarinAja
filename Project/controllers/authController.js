@@ -28,3 +28,8 @@ exports.register = (req, res) => {
     console.Register(`User baru terdaftar: ${username} (${email})`);
     res.redirect('/login');
 };
+
+exports.logout = (req, res) => {
+    // TODO: hapus session setelah login sungguhan dibuat
+    res.redirect('/login');
+};

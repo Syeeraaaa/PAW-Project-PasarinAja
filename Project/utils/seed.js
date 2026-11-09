@@ -1,5 +1,6 @@
 const sequelize = require('../config/database');
 const { Product } = require('../models/productModel');
+const { Umkm } = require('../models/umkmModel');
 
 const WA = '6281234567890'; // ganti dengan nomor WhatsApp asli
 
@@ -18,6 +19,10 @@ const data = [
   try {
     await sequelize.sync({ force: true }); // hapus tabel lama lalu buat ulang
     await Product.bulkCreate(data);
+    await Umkm.bulkCreate([
+  { nama_pemilik: 'Sekar', nama_usaha: 'Keripik Singkong', kategori: 'Makanan & Minuman', email: 'sekar@email.com', no_whatsapp: WA, foto: '/images/singkong.jpg', pesan: 'Usaha keripik singkong rumahan.', status: 'menunggu' },
+  { nama_pemilik: 'Shafa', nama_usaha: 'Kerupuk Seblak Campur', kategori: 'Makanan & Minuman', email: 'shafa@email.com', no_whatsapp: WA, foto: '/images/seblak.jpg', pesan: 'Kerupuk seblak siap seduh.', status: 'menunggu' },
+]);
     console.log('Seed selesai: 8 produk dimasukkan');
   } catch (err) {
     console.error('Seed gagal:', err.message);
