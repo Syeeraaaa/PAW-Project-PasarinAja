@@ -2,8 +2,11 @@ const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/productController');
 
-// Route Halaman Frontend (EJS)
-router.get('/', productController.renderHomePage);
+// Halaman pengunjung (tanpa login)
+router.get('/', productController.renderDashboard);
+router.get('/katalog', productController.renderKatalog);
+router.get('/produk/:id', productController.renderDetail);
+router.get('/chatbot', productController.renderChatbot);
 
 // Endpoint API
 router.get('/api/status', productController.getStatus);
