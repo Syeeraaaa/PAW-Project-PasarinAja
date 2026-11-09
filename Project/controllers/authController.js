@@ -1,11 +1,17 @@
+const config = require('../config/config'); // Mengambil konfigurasi aplikasi (termasuk appName)
+
 // Menampilkan halaman Login
 exports.renderLogin = (req, res) => {
-    res.render('auth/login');
+    res.render('auth/login', { 
+        appName: config.appName || 'PasarinAja' 
+    });
 };
 
 // Menampilkan halaman Register
 exports.renderRegister = (req, res) => {
-    res.render('auth/register');
+    res.render('auth/register', { 
+        appName: config.appName || 'PasarinAja' 
+    });
 };
 
 // Logika Proses Login
@@ -25,7 +31,7 @@ exports.login = (req, res) => {
 exports.register = (req, res) => {
     const { username, email, password } = req.body;
     // Simpan data user ke database di sini menggunakan Sequelize model
-    console.Register(`User baru terdaftar: ${username} (${email})`);
+    console.log(`User baru terdaftar: ${username} (${email})`); // Diperbaiki dari console.Register menjadi console.log
     res.redirect('/login');
 };
 
