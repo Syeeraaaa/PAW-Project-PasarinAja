@@ -1,85 +1,115 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Produk - Paseban Kawis</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = { theme: { extend: { colors: { primary: '#065F46' } } } }
-    </script>
-</head>
+<%
+  const badge = { menunggu: 'bg-amber-100 text-amber-700', ditampilkan: 'bg-emerald-100 text-emerald-700', ditolak: 'bg-red-100 text-red-700' };
+  const label = { menunggu: 'Menunggu verifikasi', ditampilkan: 'Ditampilkan', ditolak: 'Ditolak' };
+  const input = 'w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-700';
+%>
+<%- include('../partials/head', { appName: appName }) %>
 <body class="bg-gray-50 text-gray-800 font-sans">
-    <div class="min-h-screen flex flex-col md:flex-row">
-        <!-- Sidebar -->
-        <aside class="w-full md:w-72 bg-primary text-white p-6 flex flex-col justify-between">
-            <div>
-                <h1 class="text-xl font-extrabold tracking-wide mb-10">PASEBAN KAWIS</h1>
-                <nav class="space-y-3">
-                    <a href="/umkm/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-house"></i> Dashboard</a>
-                    <a href="/umkm/katalog" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-basket-shopping"></i> E-Katalog</a>
-                    <a href="/umkm/produk" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-900 font-bold text-lg"><i class="fa-solid fa-box"></i> Kelola Produk</a>
-                    <a href="/umkm/chatbot" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-robot"></i> Chatbot AI</a>
-                    <a href="/umkm/pendaftaran" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-file-pen"></i> Form Pendaftaran</a>
-                </nav>
-            </div>
-            <div class="pt-6 border-t border-emerald-800">
-                <a href="/umkm/akun" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-user"></i> Akun Saya</a>
-            </div>
-        </aside>
+<div class="min-h-screen flex flex-col md:flex-row">
+    <%- include('../partials/umkm-sidebar', { aktif: 'kelola' }) %>
 
-        <!-- Main Content -->
-        <main class="flex-1 p-8 md:p-12">
-            <h2 class="text-3xl font-extrabold text-gray-900 mb-1">Kelola Produk</h2>
-            <p class="text-gray-600 text-base mb-6">Kelola Produk UMKM Anda di sini</p>
+    <main class="flex-1 p-6 md:p-10 max-w-5xl">
+        <h2 class="text-3xl font-extrabold text-gray-900">Kelola Produk</h2>
+        <p class="text-gray-600 mb-6">Kelola Produk UMKM Anda di sini</p>
 
-            <!-- Tombol Tambah Produk (Create) -->
-            <a href="/umkm/produk/tambah" class="inline-block bg-primary text-white font-bold px-6 py-4 rounded-xl hover:bg-emerald-900 transition shadow-md mb-8">
-                + TAMBAH PRODUK
-            </a>
+        <button type="button" onclick="togglePanel('form-tambah')" class="w-full bg-[#065F46] hover:bg-emerald-800 text-white font-extrabold py-3 rounded-xl mb-3">+ TAMBAH PRODUK</button>
+        <p class="text-xs text-gray-500 mb-6">Produk baru tampil di E-Katalog setelah diverifikasi admin.</p>
 
-            <!-- Daftar Produk (Read & CRUDS List) -->
-            <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200 max-w-4xl space-y-6">
-                <h3 class="text-2xl font-bold text-gray-800">Daftar Produk</h3>
+        <!-- Form tambah produk -->
+        <div id="form-tambah" class="hidden bg-white rounded-2xl border border-gray-200 p-5 mb-6">
+            <h3 class="font-bold mb-3">Tambah Produk Baru</h3>
+            <form method="POST" action="/umkm/produk" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input name="nama" placeholder="Nama produk" required class="<%= input %>">
+                <select name="kategori" required class="<%= input %>">
+                    <% kategori.forEach(function (k) { %><option value="<%= k %>"><%= k %></option><% }); %>
+                </select>
+                <input name="harga" type="number" min="0" placeholder="Harga (Rp)" required class="<%= input %>">
+                <input name="stok" type="number" min="0" placeholder="Stok" required class="<%= input %>">
+                <textarea name="deskripsi" rows="3" placeholder="Deskripsi produk" class="<%= input %> md:col-span-2"></textarea>
+                <div class="md:col-span-2">
+                    <label class="text-sm text-gray-500">Foto produk (JPG/PNG, maksimal 2 MB)</label>
+                    <input type="file" name="gambar" accept="image/png,image/jpeg" onchange="cekFoto(this)" class="block w-full text-sm mt-1">
+                </div>
+                <div class="md:col-span-2 flex gap-2">
+                    <button class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-5 py-2 rounded-xl text-sm">Simpan</button>
+                    <button type="button" onclick="togglePanel('form-tambah')" class="border border-gray-300 px-5 py-2 rounded-xl text-sm">Batal</button>
+                </div>
+            </form>
+        </div>
 
-                <!-- Item Produk 1 -->
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 gap-4">
-                    <div class="flex items-center gap-4">
-                        <img src="/images/sambal1.jpg" alt="Produk" class="w-20 h-20 object-cover rounded-xl">
-                        <div>
-                            <h4 class="text-xl font-bold text-gray-800">Sambal kemasan</h4>
-                            <p class="text-primary font-bold">Rp 35.000</p>
-                            <span class="text-sm text-gray-500">Stok: 20</span>
+        <!-- Daftar produk -->
+        <div class="bg-gray-100 rounded-2xl p-5">
+            <h3 class="text-xl font-extrabold mb-4">Daftar Produk</h3>
+
+            <% if (produk.length === 0) { %>
+                <p class="text-sm text-gray-500">Belum ada produk. Klik "Tambah Produk" untuk mulai.</p>
+            <% } %>
+
+            <div class="space-y-3">
+                <% produk.forEach(function (p) { %>
+                    <div class="bg-white rounded-2xl border border-gray-200 p-4">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                            <div class="flex items-center gap-4">
+                                <div class="relative w-16 h-16 shrink-0 rounded-xl bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center overflow-hidden">
+                                    <span><%= p.nama.charAt(0).toUpperCase() %></span>
+                                    <% if (p.gambar) { %>
+                                        <img src="<%= p.gambar %>" alt="" class="absolute inset-0 w-full h-full object-cover" onerror="this.remove()">
+                                    <% } %>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold"><%= p.nama %></h4>
+                                    <p class="text-sm"><%= formatRupiah(p.harga) %></p>
+                                    <p class="text-sm text-gray-500">Stok: <%= p.stok %></p>
+                                    <span class="<%= badge[p.status] %> text-xs font-bold px-2.5 py-1 rounded-full inline-block mt-1"><%= label[p.status] %></span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="togglePanel('edit-<%= p.id %>')" class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold px-6 py-2.5 rounded-xl">Edit</button>
+                                <form method="POST" action="/umkm/produk/<%= p.id %>/hapus" onsubmit="return confirm('Hapus produk ini?')">
+                                    <button class="bg-red-800 hover:bg-red-900 text-white font-bold px-6 py-2.5 rounded-xl">Hapus</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Panel edit -->
+                        <div id="edit-<%= p.id %>" class="hidden mt-4 pt-4 border-t border-gray-100">
+                            <form method="POST" action="/umkm/produk/<%= p.id %>/edit" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input name="nama" value="<%= p.nama %>" required class="<%= input %>">
+                                <select name="kategori" required class="<%= input %>">
+                                    <% kategori.forEach(function (k) { %>
+                                        <option value="<%= k %>" <%= p.kategori === k ? 'selected' : '' %>><%= k %></option>
+                                    <% }); %>
+                                </select>
+                                <input name="harga" type="number" min="0" value="<%= p.harga %>" required class="<%= input %>">
+                                <input name="stok" type="number" min="0" value="<%= p.stok %>" required class="<%= input %>">
+                                <textarea name="deskripsi" rows="3" class="<%= input %> md:col-span-2"><%= p.deskripsi || '' %></textarea>
+                                <div class="md:col-span-2">
+                                    <label class="text-sm text-gray-500">Ganti foto (kosongkan kalau tidak diganti)</label>
+                                    <input type="file" name="gambar" accept="image/png,image/jpeg" onchange="cekFoto(this)" class="block w-full text-sm mt-1">
+                                </div>
+                                <div class="md:col-span-2 flex gap-2">
+                                    <button class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-5 py-2 rounded-xl text-sm">Simpan Perubahan</button>
+                                    <button type="button" onclick="togglePanel('edit-<%= p.id %>')" class="border border-gray-300 px-5 py-2 rounded-xl text-sm">Batal</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-                        <a href="/umkm/produk/edit/1" class="bg-amber-400 hover:bg-amber-500 text-gray-900 font-bold px-5 py-2.5 rounded-xl transition shadow-sm text-center">Edit</a>
-                        <form action="/umkm/produk/hapus/1" method="POST" onsubmit="return confirm('Yakin ingin menghapus produk ini?');">
-                            <button type="submit" class="bg-red-800 hover:bg-red-900 text-white font-bold px-5 py-2.5 rounded-xl transition shadow-sm">Hapus</button>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Item Produk 2 -->
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 gap-4">
-                    <div class="flex items-center gap-4">
-                        <img src="/images/seblak.jpg" alt="Produk" class="w-20 h-20 object-cover rounded-xl">
-                        <div>
-                            <h4 class="text-xl font-bold text-gray-800">Kerupuk Seblak Campur</h4>
-                            <p class="text-primary font-bold">Rp 20.000</p>
-                            <span class="text-sm text-gray-500">Stok: 20</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-                        <a href="/umkm/produk/edit/2" class="bg-amber-400 hover:bg-amber-500 text-gray-900 font-bold px-5 py-2.5 rounded-xl transition shadow-sm text-center">Edit</a>
-                        <form action="/umkm/produk/hapus/2" method="POST" onsubmit="return confirm('Yakin ingin menghapus produk ini?');">
-                            <button type="submit" class="bg-red-800 hover:bg-red-900 text-white font-bold px-5 py-2.5 rounded-xl transition shadow-sm">Hapus</button>
-                        </form>
-                    </div>
-                </div>
+                <% }); %>
             </div>
-        </main>
-    </div>
-</body>
-</html>
+        </div>
+    </main>
+</div>
+
+<script>
+    function togglePanel(id) {
+        document.getElementById(id).classList.toggle('hidden');
+    }
+    function cekFoto(input) {
+        var file = input.files[0];
+        if (file && file.size > 2 * 1024 * 1024) {
+            alert('Ukuran foto maksimal 2 MB');
+            input.value = '';
+        }
+    }
+</script>
+<%- include('../partials/footer') %>
