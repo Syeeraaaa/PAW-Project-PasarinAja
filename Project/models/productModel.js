@@ -1,9 +1,11 @@
 // models/productModel.js
-// Model: menyimpan dan mengelola data produk UMKM Desa Paseban Kawis.
-// Data berupa array statis di memori (tanpa database), sesuai ketentuan tugas.
-// Catatan: seluruh data di bawah adalah DATA CONTOH untuk keperluan tugas.
+// Model: mengelola data produk UMKM Desa Paseban Kawis di database PostgreSQL.
+// Semua query database ada di sini, controller hanya memanggil fungsinya.
 
-// Kategori mengikuti pilihan "Kategori Usaha" pada form pendaftaran UMKM (Week 2)
+const { DataTypes, Op, fn, col, where } = require('sequelize');
+const sequelize = require('../config/database');
+
+// Kategori mengikuti pilihan "Kategori Usaha" pada form pendaftaran UMKM
 const KATEGORI = [
   'Makanan & Minuman',
   'Kerajinan',
@@ -12,119 +14,99 @@ const KATEGORI = [
   'Lainnya',
 ];
 
-// Data produk (harga dalam Rupiah)
-let products = [
+// Definisi tabel "produk"
+const Product = sequelize.define(
+  'Product',
   {
-    id: 1,
-    nama: 'Keripik Singkong Original',
-    kategori: 'Makanan & Minuman',
-    harga: 15000,
-    deskripsi: 'Keripik singkong renyah dengan bumbu gurih, dikemas 250 gram.',
-    umkm: 'Keripik Singkong Bu Sari',
+    nama: { type: DataTypes.STRING, allowNull: false },
+    kategori: { type: DataTypes.STRING, allowNull: false },
+    harga: { type: DataTypes.INTEGER, allowNull: false },
+    stok: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+    deskripsi: { type: DataTypes.TEXT },
+    gambar: { type: DataTypes.STRING },
+    umkm: { type: DataTypes.STRING },
+    no_whatsapp: { type: DataTypes.STRING },
+    status: {
+      type: DataTypes.ENUM('menunggu', 'ditampilkan', 'ditolak'),
+      allowNull: false,
+      defaultValue: 'ditampilkan',
+    },
   },
-  {
-    id: 2,
-    nama: 'Keripik Singkong Balado',
-    kategori: 'Makanan & Minuman',
-    harga: 17000,
-    deskripsi: 'Keripik singkong dengan bumbu balado pedas manis, kemasan 250 gram.',
-    umkm: 'Keripik Singkong Bu Sari',
-  },
-  {
-    id: 3,
-    nama: 'Kopi Robusta Bubuk',
-    kategori: 'Makanan & Minuman',
-    harga: 45000,
-    deskripsi: 'Kopi robusta sangrai tingkat medium, digiling halus, kemasan 200 gram.',
-    umkm: 'Kopi Desa Kawis',
-  },
-  {
-    id: 4,
-    nama: 'Tas Anyaman Pandan',
-    kategori: 'Kerajinan',
-    harga: 85000,
-    deskripsi: 'Tas tangan dari anyaman pandan, ringan dan kuat, dibuat manual.',
-    umkm: 'Anyaman Mawar',
-  },
-  {
-    id: 5,
-    nama: 'Tempat Tisu Bambu',
-    kategori: 'Kerajinan',
-    harga: 35000,
-    deskripsi: 'Tempat tisu berbahan bambu dengan finishing halus untuk dekorasi rumah.',
-    umkm: 'Bambu Kreasi',
-  },
-  {
-    id: 6,
-    nama: 'Batik Tulis Motif Daun',
-    kategori: 'Fashion',
-    harga: 150000,
-    deskripsi: 'Kain batik tulis motif daun, ukuran 2 meter, pewarna aman.',
-    umkm: 'Batik Kawis',
-  },
-  {
-    id: 7,
-    nama: 'Beras Organik',
-    kategori: 'Pertanian',
-    harga: 70000,
-    deskripsi: 'Beras organik tanpa pestisida kimia, kemasan 5 kilogram.',
-    umkm: 'Tani Makmur',
-  },
-  {
-    id: 8,
-    nama: 'Madu Hutan Murni',
-    kategori: 'Lainnya',
-    harga: 90000,
-    deskripsi: 'Madu murni tanpa campuran gula, botol kaca 250 ml.',
-    umkm: 'Madu Lestari',
-  },
+  { tableName: 'produk' }
+);
+
+// Kolom yang boleh diubah lewat create/update
+const KOLOM = [
+  'nama',
+  'kategori',
+  'harga',
+  'stok',
+  'deskripsi',
+  'gambar',
+  'umkm',
+  'no_whatsapp',
+  'status',
 ];
 
-// Penanda ID berikutnya (naik terus agar ID tidak dipakai ulang setelah dihapus)
-let nextId = Math.max(...products.map((p) => p.id)) + 1;
+// Ambil hanya kolom yang diizinkan dari data masukan
+const ambilKolom = (data = {}) => {
+  const hasil = {};
+  for (const kolom of KOLOM) {
+    if (data[kolom] !== undefined) hasil[kolom] = data[kolom];
+  }
+  if (hasil.harga !== undefined) hasil.harga = Number(hasil.harga);
+  if (hasil.stok !== undefined) hasil.stok = Number(hasil.stok);
+  return hasil;
+};
 
-// Mengembalikan salinan agar data asli tidak berubah dari luar model
-const salin = (produk) => ({ ...produk });
-
-// Mengubah ID dari URL (string) menjadi angka
-const keAngka = (id) => Number(id);
+// Ubah instance Sequelize jadi objek biasa
+const keObjek = (produk) => (produk ? produk.get({ plain: true }) : null);
 
 // ----------------------------------------------------------------
 // READ
 // ----------------------------------------------------------------
 
 // Semua produk
-function getAll() {
-  return products.map(salin);
+async function getAll() {
+  const daftar = await Product.findAll({ order: [['id', 'ASC']] });
+  return daftar.map(keObjek);
 }
 
 // Satu produk berdasarkan ID, atau null bila tidak ada
-function getById(id) {
-  const produk = products.find((p) => p.id === keAngka(id));
-  return produk ? salin(produk) : null;
+async function getById(id) {
+  return keObjek(await Product.findByPk(id));
 }
 
 // Produk berdasarkan kategori (tidak membedakan huruf besar/kecil)
- function getByCategory(kategori) {
+async function getByCategory(kategori) {
   const kunci = String(kategori).trim().toLowerCase();
-  return products
-    .filter((p) => p.kategori.toLowerCase() === kunci)
-    .map(salin);
+  const daftar = await Product.findAll({
+    where: where(fn('lower', col('kategori')), kunci),
+    order: [['id', 'ASC']],
+  });
+  return daftar.map(keObjek);
 }
 
 // Cari produk dari nama, deskripsi, atau nama UMKM
-function search(keyword) {
-  const kunci = String(keyword).trim().toLowerCase();
+async function search(keyword) {
+  const kunci = String(keyword).trim();
   if (kunci === '') return getAll();
 
-  return products
-    .filter(
-      (p) =>
-        p.nama.toLowerCase().includes(kunci) ||
-        p.deskripsi.toLowerCase().includes(kunci) ||
-        p.umkm.toLowerCase().includes(kunci)
-    )
-    .map(salin);
+  // escape karakter khusus LIKE supaya % dan _ dianggap huruf biasa
+  const aman = kunci.replace(/[\\%_]/g, '\\$&');
+  const pola = `%${aman}%`;
+
+  const daftar = await Product.findAll({
+    where: {
+      [Op.or]: [
+        { nama: { [Op.iLike]: pola } },
+        { deskripsi: { [Op.iLike]: pola } },
+        { umkm: { [Op.iLike]: pola } },
+      ],
+    },
+    order: [['id', 'ASC']],
+  });
+  return daftar.map(keObjek);
 }
 
 // Daftar kategori yang tersedia
@@ -133,8 +115,8 @@ function getCategories() {
 }
 
 // Jumlah seluruh produk
-function count() {
-  return products.length;
+async function count() {
+  return Product.count();
 }
 
 // ----------------------------------------------------------------
@@ -143,43 +125,32 @@ function count() {
 // ----------------------------------------------------------------
 
 // Tambah produk baru, mengembalikan produk yang tersimpan
-function create({ nama, kategori, harga, deskripsi, umkm }) {
-  const produkBaru = {
-    id: nextId++,
-    nama,
-    kategori,
-    harga: Number(harga),
-    deskripsi,
-    umkm,
-  };
-  products.push(produkBaru);
-  return salin(produkBaru);
+async function create(data) {
+  const produkBaru = await Product.create(ambilKolom(data));
+  return keObjek(produkBaru);
 }
 
 // Ubah sebagian atau seluruh data produk, mengembalikan produk terbaru atau null
-function update(id, data) {
-  const produk = products.find((p) => p.id === keAngka(id));
+async function update(id, data) {
+  const produk = await Product.findByPk(id);
   if (!produk) return null;
 
-  const bolehDiubah = ['nama', 'kategori', 'harga', 'deskripsi', 'umkm'];
-  for (const kolom of bolehDiubah) {
-    if (data[kolom] !== undefined) {
-      produk[kolom] = kolom === 'harga' ? Number(data[kolom]) : data[kolom];
-    }
-  }
-  return salin(produk);
+  await produk.update(ambilKolom(data));
+  return keObjek(produk);
 }
 
 // Hapus produk, mengembalikan produk yang dihapus atau null
-function remove(id) {
-  const index = products.findIndex((p) => p.id === keAngka(id));
-  if (index === -1) return null;
+async function remove(id) {
+  const produk = await Product.findByPk(id);
+  if (!produk) return null;
 
-  const [dihapus] = products.splice(index, 1);
-  return salin(dihapus);
+  const dihapus = keObjek(produk);
+  await produk.destroy();
+  return dihapus;
 }
 
-module.exports ={
+module.exports = {
+  Product, // dipakai seeder
   getAll,
   getById,
   getByCategory,
