@@ -1,80 +1,77 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Pendaftaran UMKM - Paseban Kawis</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = { theme: { extend: { colors: { primary: '#065F46' } } } }
-    </script>
-</head>
+<%
+  const input = 'w-full bg-gray-200 rounded-full px-5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-700';
+%>
+<%- include('../partials/head', { appName: appName }) %>
 <body class="bg-gray-50 text-gray-800 font-sans">
-    <div class="min-h-screen flex flex-col md:flex-row">
-        <!-- Sidebar -->
-        <aside class="w-full md:w-72 bg-primary text-white p-6 flex flex-col justify-between">
-            <div>
-                <h1 class="text-xl font-extrabold tracking-wide mb-10">PASEBAN KAWIS</h1>
-                <nav class="space-y-3">
-                    <a href="/umkm/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-house"></i> Dashboard</a>
-                    <a href="/umkm/katalog" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-basket-shopping"></i> E-Katalog</a>
-                    <a href="/umkm/produk" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-box"></i> Kelola Produk</a>
-                    <a href="/umkm/chatbot" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-robot"></i> Chatbot AI</a>
-                    <a href="/umkm/pendaftaran" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-900 font-bold text-lg"><i class="fa-solid fa-file-pen"></i> Form Pendaftaran</a>
-                </nav>
-            </div>
-        </aside>
+<div class="min-h-screen flex flex-col md:flex-row">
+    <%- include('../partials/umkm-sidebar', { aktif: 'pendaftaran' }) %>
 
-        <!-- Main Content -->
-        <main class="flex-1 p-8 md:p-12 flex justify-center">
-            <div class="bg-white rounded-3xl p-8 md:p-10 shadow-sm border border-gray-200 w-full max-w-2xl space-y-6">
-                <div class="text-center">
-                    <h2 class="text-3xl font-extrabold text-gray-900">Form Pendaftaran UMKM</h2>
-                    <p class="text-gray-500 text-base mt-1">Isi data untuk bergabung</p>
+    <main class="flex-1 p-6 md:p-10 flex justify-center">
+        <div class="w-full max-w-xl bg-gray-100 border border-gray-300 rounded-3xl p-8 h-fit">
+            <h2 class="text-2xl font-extrabold text-center">Form Pendaftaran UMKM</h2>
+            <p class="text-sm text-center mb-6">Isi data untuk bergabung</p>
+
+            <% if (berhasil) { %>
+                <div class="bg-emerald-100 text-emerald-800 text-sm font-semibold rounded-xl p-3 mb-5">
+                    Data terkirim! Pendaftaran kamu akan diverifikasi admin.
                 </div>
+            <% } %>
 
-                <form action="/umkm/pendaftaran" method="POST" enctype="multipart/form-data" class="space-y-5">
-                    <div>
-                        <label class="block font-bold text-gray-700 mb-2">Nama Lengkap</label>
-                        <input type="text" name="nama" placeholder="Contoh: Siti Aminah" required class="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl px-5 py-4 text-base focus:outline-none focus:border-primary">
+            <form method="POST" action="/umkm/pendaftaran" enctype="multipart/form-data" class="space-y-4">
+                <div>
+                    <label class="text-sm font-medium">Nama Lengkap</label>
+                    <input name="nama_pemilik" placeholder="Contoh: Siti Aminah" required class="<%= input %>">
+                </div>
+                <div>
+                    <label class="text-sm font-medium">Email</label>
+                    <input name="email" type="email" placeholder="nama@email.com" class="<%= input %>">
+                </div>
+                <div>
+                    <label class="text-sm font-medium">Nama UMKM / Usaha</label>
+                    <input name="nama_usaha" placeholder="Contoh: Keripik Singkong Mak Nyus" required class="<%= input %>">
+                </div>
+                <div>
+                    <label class="text-sm font-medium">No. WhatsApp</label>
+                    <input name="no_whatsapp" placeholder="Contoh: 6281234567890" class="<%= input %>">
+                </div>
+                <div>
+                    <label class="text-sm font-medium">Kategori Usaha</label>
+                    <select name="kategori" required class="<%= input %>">
+                        <option value="" disabled selected>Pilih Kategori</option>
+                        <% kategori.forEach(function (k) { %><option value="<%= k %>"><%= k %></option><% }); %>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-sm font-medium">Foto UMKM / Produk</label>
+                    <div class="relative bg-gray-200 rounded-2xl py-6 text-center hover:bg-gray-300 transition">
+                        <p id="nama-file" class="text-sm font-medium">Tarik foto ke sini atau pilih file</p>
+                        <p class="text-xs text-gray-500">JPG atau PNG, maksimal 2 MB</p>
+                        <input type="file" name="foto" accept="image/png,image/jpeg" onchange="cekFoto(this)"
+                               class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                     </div>
-                    <div>
-                        <label class="block font-bold text-gray-700 mb-2">Email</label>
-                        <input type="email" name="email" placeholder="nama@email.com" required class="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl px-5 py-4 text-base focus:outline-none focus:border-primary">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-gray-700 mb-2">Nama UMKM / Usaha</label>
-                        <input type="text" name="nama_usaha" placeholder="Contoh: Keripik Singkong Mak Nyus" required class="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl px-5 py-4 text-base focus:outline-none focus:border-primary">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-gray-700 mb-2">Kategori Usaha</label>
-                        <select name="kategori" required class="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl px-5 py-4 text-base focus:outline-none focus:border-primary">
-                            <option value="">Pilih Kategori</option>
-                            <option value="makanan">Olahan Pangan & Makanan</option>
-                            <option value="kerajinan">Kerajinan Tangan</option>
-                            <option value="fashion">Fashion</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-bold text-gray-700 mb-2">Foto UMKM / Produk</label>
-                        <div class="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center bg-gray-50 hover:bg-gray-100 transition cursor-pointer">
-                            <i class="fa-solid fa-cloud-arrow-up text-3xl text-gray-400 mb-2"></i>
-                            <p class="font-medium text-gray-700">Tarik foto ke sini atau pilih file</p>
-                            <span class="text-xs text-gray-400">JPG atau PNG, maksimal 2 MB.</span>
-                            <input type="file" name="foto" class="hidden">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block font-bold text-gray-700 mb-2">Pesan / Keterangan</label>
-                        <textarea name="keterangan" rows="3" placeholder="Ceritakan singkat usaha anda" class="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl p-5 text-base focus:outline-none focus:border-primary"></textarea>
-                    </div>
-                    <button type="submit" class="w-full bg-primary text-white font-bold py-4 rounded-2xl text-lg hover:bg-emerald-900 transition shadow-md">
-                        Kirim Data
-                    </button>
-                </form>
-            </div>
-        </main>
-    </div>
-</body>
-</html>
+                </div>
+                <div>
+                    <label class="text-sm font-medium">Pesan / Keterangan</label>
+                    <textarea name="pesan" rows="3" placeholder="Ceritakan singkat usaha anda" class="w-full bg-gray-200 rounded-2xl px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-700"></textarea>
+                </div>
+                <button class="w-full bg-[#065F46] hover:bg-emerald-800 text-white font-extrabold py-3 rounded-xl">Kirim Data</button>
+            </form>
+        </div>
+    </main>
+</div>
+
+<script>
+    function cekFoto(input) {
+        var info = document.getElementById('nama-file');
+        var file = input.files[0];
+        if (!file) { info.textContent = 'Tarik foto ke sini atau pilih file'; return; }
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Ukuran foto maksimal 2 MB');
+            input.value = '';
+            info.textContent = 'Tarik foto ke sini atau pilih file';
+            return;
+        }
+        info.textContent = file.name;
+    }
+</script>
+<%- include('../partials/footer') %>
