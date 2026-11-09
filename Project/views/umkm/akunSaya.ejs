@@ -1,73 +1,71 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Akun Saya - Paseban Kawis</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = { theme: { extend: { colors: { primary: '#065F46' } } } }
-    </script>
-</head>
+<%
+  const input = 'w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-700';
+  const label = { menunggu: 'Menunggu verifikasi', disetujui: 'Terverifikasi', ditolak: 'Ditolak' };
+%>
+<%- include('../partials/head', { appName: appName }) %>
 <body class="bg-gray-50 text-gray-800 font-sans">
-    <div class="min-h-screen flex flex-col md:flex-row">
-        <!-- Sidebar -->
-        <aside class="w-full md:w-72 bg-primary text-white p-6 flex flex-col justify-between">
+<div class="min-h-screen flex flex-col md:flex-row">
+    <%- include('../partials/umkm-sidebar', { aktif: 'akun' }) %>
+
+    <main class="flex-1 p-6 md:p-10 max-w-3xl">
+        <h2 class="text-3xl font-extrabold text-gray-900">Akun Saya</h2>
+        <p class="text-gray-600 mb-6">Kelola informasi akun anda</p>
+
+        <div class="bg-gray-100 rounded-2xl p-8 text-center mb-6">
+            <div class="w-24 h-24 mx-auto rounded-full bg-gray-300 flex items-center justify-center text-4xl">
+                <%= umkm.nama_pemilik.charAt(0).toUpperCase() %>
+            </div>
+            <p class="mt-3 text-sm"><%= umkm.nama_pemilik %></p>
+            <p class="font-medium">Pemilik UMKM</p>
+            <div class="flex justify-center gap-3 mt-5">
+                <button type="button" onclick="togglePanel('form-edit')" class="bg-[#065F46] hover:bg-emerald-800 text-white font-semibold px-6 py-2.5 rounded-xl">Edit Profil</button>
+                <a href="/logout" onclick="return confirm('Yakin ingin keluar?')" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2.5 rounded-xl">Logout</a>
+            </div>
+        </div>
+
+        <!-- Form edit profil -->
+        <div id="form-edit" class="hidden bg-white rounded-2xl border border-gray-200 p-5 mb-6">
+            <form method="POST" action="/umkm/akun" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input name="nama_pemilik" value="<%= umkm.nama_pemilik %>" placeholder="Nama lengkap" required class="<%= input %>">
+                <input name="nama_usaha" value="<%= umkm.nama_usaha %>" placeholder="Nama usaha UMKM" required class="<%= input %>">
+                <input name="email" type="email" value="<%= umkm.email || '' %>" placeholder="Email" class="<%= input %>">
+                <input name="no_whatsapp" value="<%= umkm.no_whatsapp || '' %>" placeholder="No. WhatsApp" class="<%= input %>">
+                <div class="md:col-span-2 flex gap-2">
+                    <button class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-5 py-2 rounded-xl text-sm">Simpan Perubahan</button>
+                    <button type="button" onclick="togglePanel('form-edit')" class="border border-gray-300 px-5 py-2 rounded-xl text-sm">Batal</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="bg-gray-100 rounded-2xl p-8 space-y-4">
+            <h3 class="text-xl">Informasi akun</h3>
             <div>
-                <h1 class="text-xl font-extrabold tracking-wide mb-10">PASEBAN KAWIS</h1>
-                <nav class="space-y-3">
-                    <a href="/umkm/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-house"></i> Dashboard</a>
-                    <a href="/umkm/katalog" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-basket-shopping"></i> E-Katalog</a>
-                    <a href="/umkm/produk" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-box"></i> Kelola Produk</a>
-                    <a href="/umkm/chatbot" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-robot"></i> Chatbot AI</a>
-                    <a href="/umkm/pendaftaran" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-file-pen"></i> Form Pendaftaran</a>
-                </nav>
+                <p class="text-sm text-gray-500">Nama lengkap</p>
+                <p class="text-lg"><%= umkm.nama_pemilik %></p>
             </div>
-            <div class="pt-6 border-t border-emerald-800">
-                <a href="/umkm/akun" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-900 font-bold text-lg"><i class="fa-solid fa-user"></i> Akun Saya</a>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="flex-1 p-8 md:p-12 space-y-8 max-w-4xl">
             <div>
-                <h2 class="text-3xl font-extrabold text-gray-900 mb-1">Akun Saya</h2>
-                <p class="text-gray-600 text-base">Kelola informasi akun anda</p>
+                <p class="text-sm text-gray-500">Nama usaha UMKM</p>
+                <p class="text-lg"><%= umkm.nama_usaha %></p>
             </div>
+            <div>
+                <p class="text-sm text-gray-500">Email</p>
+                <p class="text-lg"><%= umkm.email || '-' %></p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">No. WhatsApp</p>
+                <p class="text-lg"><%= umkm.no_whatsapp || '-' %></p>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500">Status</p>
+                <p class="text-lg"><%= label[umkm.status] %></p>
+            </div>
+        </div>
+    </main>
+</div>
 
-            <!-- Profile Card Header -->
-            <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-200 text-center space-y-4">
-                <div class="w-24 h-24 bg-gray-200 text-gray-700 rounded-full flex items-center justify-center text-4xl font-extrabold mx-auto">
-                    K
-                </div>
-                <div>
-                    <h3 class="text-2xl font-bold text-gray-800">Kelompok Dua</h3>
-                    <p class="text-gray-500 text-base">Pemilik UMKM</p>
-                </div>
-                <div class="pt-2">
-                    <a href="/umkm/akun/edit" class="inline-block bg-primary text-white font-bold px-8 py-3 rounded-xl hover:bg-emerald-900 transition shadow-sm">
-                        Edit Profil
-                    </a>
-                </div>
-            </div>
-
-            <!-- Account Information Details -->
-            <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-200 space-y-6">
-                <h3 class="text-2xl font-bold text-gray-800 border-b pb-4">Informasi akun</h3>
-                
-                <div class="space-y-4 text-base">
-                    <div>
-                        <span class="text-gray-400 block text-sm">Nama lengkap</span>
-                        <strong class="text-xl text-gray-800">Kelompok Dua</strong>
-                    </div>
-                    <div>
-                        <span class="text-gray-400 block text-sm">Nama usaha UMKM</span>
-                        <strong class="text-xl text-gray-800">Sambal Kemasan</strong>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-</body>
-</html>
+<script>
+    function togglePanel(id) {
+        document.getElementById(id).classList.toggle('hidden');
+    }
+</script>
+<%- include('../partials/footer') %>
