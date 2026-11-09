@@ -25,6 +25,8 @@ const Product = sequelize.define(
     deskripsi: { type: DataTypes.TEXT },
     gambar: { type: DataTypes.STRING },
     umkm: { type: DataTypes.STRING },
+    umkm_id: { type: DataTypes.INTEGER }, 
+    
     no_whatsapp: { type: DataTypes.STRING },
     status: {
       type: DataTypes.ENUM('menunggu', 'ditampilkan', 'ditolak'),
@@ -44,6 +46,7 @@ const KOLOM = [
   'deskripsi',
   'gambar',
   'umkm',
+  'umkm_id', 
   'no_whatsapp',
   'status',
 ];
@@ -56,6 +59,7 @@ const ambilKolom = (data = {}) => {
   }
   if (hasil.harga !== undefined) hasil.harga = Number(hasil.harga);
   if (hasil.stok !== undefined) hasil.stok = Number(hasil.stok);
+  if (hasil.umkm_id !== undefined && hasil.umkm_id !== null) hasil.umkm_id = Number(hasil.umkm_id); // Pastikan angka
   return hasil;
 };
 
@@ -149,6 +153,33 @@ async function remove(id) {
   return dihapus;
 }
 
+// ----------------------------------------------------------------
+// [TAMBAHAN 3] FUNGSI BARU
+// ----------------------------------------------------------------
+
+// Produk milik satu UMKM (halaman Kelola Produk)
+async function getByUmkm(umkmId) {
+  const daftar = await Product.findAll({ 
+    where: { umkm_id: umkmId }, 
+    order: [['id', 'DESC']] 
+  });
+  return daftar.map(keObjek);
+}
+
+// Pencarian untuk halaman publik: hanya produk yang sudah diverifikasi admin
+async function searchPublic(keyword) {
+  const semua = await search(keyword);
+  return semua.filter((p) => p.status === 'ditampilkan');
+}
+
+// Samakan nama usaha dan nomor WhatsApp di semua produk milik satu UMKM
+async function syncUmkm(umkmId, { umkm, no_whatsapp }) {
+  await Product.update(
+    { umkm, no_whatsapp }, 
+    { where: { umkm_id: umkmId } }
+  );
+}
+
 module.exports = {
   Product, // dipakai seeder
   getAll,
@@ -160,4 +191,7 @@ module.exports = {
   create,
   update,
   remove,
+  getByUmkm,
+  searchPublic,
+  syncUmkm,
 };

@@ -86,4 +86,14 @@ async function remove(id) {
   return dihapus;
 }
 
-module.exports = { Umkm, list, getLatest, count, create, update, remove };
+async function getById(id) {
+  return keObjek(await Umkm.findByPk(id));
+}
+
+// SEMENTARA: UMKM aktif = UMKM pertama yang sudah disetujui
+async function getAktif() {
+  const umkm = await Umkm.findOne({ where: { status: 'disetujui' }, order: [['id', 'ASC']] });
+  return keObjek(umkm);
+}
+
+module.exports = { Umkm, list, getById, getAktif, getLatest, count, create, update, remove };
