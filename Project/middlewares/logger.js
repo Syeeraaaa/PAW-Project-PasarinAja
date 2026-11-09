@@ -1,5 +1,6 @@
-// Middleware: mencatat setiap request yang masuk ke server ke terminal.
-// Format: [waktu] METHOD URL STATUS - durasi
+// middlewares/logger.js
+// Middleware: mencatat setiap request yang masuk ke terminal.
+// Format: [waktu] METHOD URL STATUS - durasi ms
 
 const { formatTimestamp } = require('../utils/formatter');
 
@@ -10,9 +11,8 @@ const logger = (req, res, next) => {
   // jadi status code dan durasi baru bisa dicatat di sini
   res.on('finish', () => {
     const durasi = Date.now() - mulai;
-    const waktu = new Date().toLocaleString('id-ID', { hour12: false });
     console.log(
-      `[${formatTimestamp()}] ${req.method} ${req.originalUrl} ${res.statusCode}`
+      `[${formatTimestamp()}] ${req.method} ${req.originalUrl} ${res.statusCode} - ${durasi}ms`
     );
   });
 
