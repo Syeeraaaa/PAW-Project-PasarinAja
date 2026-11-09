@@ -10,7 +10,7 @@ const renderDashboard = (req, res) => {
 const renderKatalog = async (req, res, next) => {
   try {
     const q = req.query.q || '';
-    const produk = await produkModel.search(q);
+    const produk = await produkModel.searchPublic(q);   // hanya yang sudah diverifikasi
     res.render('publik/katalog', { appName: config.appName, produk, q, formatRupiah });
   } catch (error) {
     next(error);
@@ -20,7 +20,9 @@ const renderKatalog = async (req, res, next) => {
 const renderDetail = async (req, res, next) => {
   try {
     const produk = await produkModel.getById(req.params.id);
-    if (!produk) return res.status(404).send('Produk tidak ditemukan');
+    if (!produk || produk.status !== 'ditampilkan') {
+      return res.status(404).send('Produk tidak ditemukan');
+    }
     res.render('publik/detail', { appName: config.appName, produk, formatRupiah });
   } catch (error) {
     next(error);

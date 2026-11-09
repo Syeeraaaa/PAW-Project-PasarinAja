@@ -18,12 +18,22 @@ const data = [
 (async () => {
   try {
     await sequelize.sync({ force: true }); // hapus tabel lama lalu buat ulang
-    await Product.bulkCreate(data);
-    await Umkm.bulkCreate([
-  { nama_pemilik: 'Sekar', nama_usaha: 'Keripik Singkong', kategori: 'Makanan & Minuman', email: 'sekar@email.com', no_whatsapp: WA, foto: '/images/singkong.jpg', pesan: 'Usaha keripik singkong rumahan.', status: 'menunggu' },
-  { nama_pemilik: 'Shafa', nama_usaha: 'Kerupuk Seblak Campur', kategori: 'Makanan & Minuman', email: 'shafa@email.com', no_whatsapp: WA, foto: '/images/seblak.jpg', pesan: 'Kerupuk seblak siap seduh.', status: 'menunggu' },
-]);
-    console.log('Seed selesai: 8 produk dimasukkan');
+
+    // UMKM pertama (disetujui) jadi UMKM aktif sementara
+    const daftarUmkm = await Umkm.bulkCreate([
+      { nama_pemilik: 'Kelompok Dua', nama_usaha: 'Sambal Kemasan', kategori: 'Makanan & Minuman', email: 'kelompok2@email.com', no_whatsapp: WA, foto: '/images/sambal.jpg', pesan: 'Sambal kemasan khas desa.', status: 'disetujui' },
+      { nama_pemilik: 'Sekar', nama_usaha: 'Keripik Singkong', kategori: 'Makanan & Minuman', email: 'sekar@email.com', no_whatsapp: WA, foto: '/images/singkong.jpg', pesan: 'Usaha keripik singkong rumahan.', status: 'menunggu' },
+      { nama_pemilik: 'Shafa', nama_usaha: 'Kerupuk Seblak Campur', kategori: 'Makanan & Minuman', email: 'shafa@email.com', no_whatsapp: WA, foto: '/images/seblak.jpg', pesan: 'Kerupuk seblak siap seduh.', status: 'disetujui' },
+    ]);
+    const aktif = daftarUmkm[0];
+
+    await Product.bulkCreate([
+      ...data,
+      { nama: 'Sambal Kemasan', kategori: 'Makanan & Minuman', harga: 35000, stok: 20, deskripsi: 'Sambal kemasan dalam tiga varian favorit.', umkm: aktif.nama_usaha, umkm_id: aktif.id, no_whatsapp: aktif.no_whatsapp, gambar: '/images/sambal.jpg', status: 'ditampilkan' },
+      { nama: 'Kerupuk Seblak Campur', kategori: 'Makanan & Minuman', harga: 20000, stok: 20, deskripsi: 'Kerupuk seblak campur siap seduh.', umkm: aktif.nama_usaha, umkm_id: aktif.id, no_whatsapp: aktif.no_whatsapp, gambar: '/images/seblak.jpg', status: 'menunggu' },
+    ]);
+
+    console.log('Seed selesai');
   } catch (err) {
     console.error('Seed gagal:', err.message);
   } finally {
