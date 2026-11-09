@@ -1,0 +1,52 @@
+<%- include('partials/head', { appName: appName }) %>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <div class="min-h-screen flex flex-col md:flex-row">
+        <!-- Sidebar -->
+        <aside class="w-full md:w-72 bg-primary text-white p-6 flex flex-col justify-between">
+            <div>
+                <h1 class="text-xl font-extrabold tracking-wide mb-10">PASEBAN KAWIS</h1>
+                <nav class="space-y-4">
+                    <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-house"></i> Dashboard</a>
+                    <a href="/katalog" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-emerald-900 font-bold text-lg"><i class="fa-solid fa-basket-shopping"></i> E-Katalog</a>
+                    <a href="/chatbot" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-900/50 font-medium text-lg transition"><i class="fa-solid fa-robot"></i> Chatbot AI</a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-8 md:p-12">
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-6">Detail Produk</h2>
+
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-200 max-w-4xl space-y-6">
+                <!-- Image Gallery Preview -->
+                <div class="bg-amber-50/50 rounded-2xl p-4 text-center">
+                    <div class="flex justify-center gap-4 mb-2">
+                        <div class="text-center"><img src="/images/sambal1.jpg" class="w-24 h-24 object-cover rounded-xl mb-1"><span class="text-xs font-bold">Sambal Baby Cumi Pete</span></div>
+                        <div class="text-center"><img src="/images/sambal2.jpg" class="w-24 h-24 object-cover rounded-xl mb-1"><span class="text-xs font-bold">Sambal Cakalang</span></div>
+                        <div class="text-center"><img src="/images/sambal3.jpg" class="w-24 h-24 object-cover rounded-xl mb-1"><span class="text-xs font-bold">Sambal Cumi Pete</span></div>
+                    </div>
+                    <span class="text-sm font-medium text-gray-600">Pilih favoritmu! ♡</span>
+                </div>
+
+                <!-- Price & Title -->
+                <div class="flex justify-between items-center border-b pb-4">
+                    <h3 class="text-2xl font-bold text-gray-800">Sambal kemasan</h3>
+                    <span class="text-2xl font-extrabold text-primary">Rp 35.000</span>
+                </div>
+
+                <!-- Description Box -->
+                <div>
+                    <label class="font-bold text-gray-700 block mb-2">Deskripsi Produk:</label>
+                    <div class="bg-gray-50 border border-gray-200 rounded-2xl p-5 text-gray-600 text-base leading-relaxed">
+                        Nikmati kelezatan rasa autentik khas rumahan dengan bahan-bahan pilihan berkualitas tinggi. Tersedia dalam 3 varian favorit: Sambal Baby Cumi Pete yang gurih menggugah selera, Sambal Cakalang dengan suwiran ikan segar yang kaya rasa, serta Sambal Cumi Pete klasik yang pedasnya pas di lidah. Dikemas higienis, praktis dibawa ke mana saja, dan cocok menjadi pendamping setia setiap hidangan hangat Anda!
+                    </div>
+                </div>
+
+                <!-- WhatsApp Button -->
+                <a href="https://wa.me/6281234567890?text=Halo,%20saya%20tertarik%20membeli%20produk%20Sambal%20Kemasan" target="_blank" class="block w-full bg-primary text-white text-center font-bold py-4 rounded-xl hover:bg-emerald-900 transition shadow-md text-lg">
+                    Hubungi Via WhatsApp
+                </a>
+            </div>
+        </main>
+    </div>
+<%- include('partials/footer') %>
