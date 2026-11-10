@@ -1,36 +1,36 @@
 <!-- views/publik/chatbot.ejs -->
-<%- include('../partials/head', { title: `Tanya Desa (Chatbot) - ${appName}` }) %>
+<%- include('../partials/head', { title: `Chatbot AI - ${appName}` }) %>
+<body class="bg-gray-50 text-gray-800 font-sans">
+<div class="min-h-screen flex flex-col md:flex-row">
+    <%- include('../partials/publik-sidebar', { aktif: 'chatbot' }) %>
 
-<body class="bg-gray-50 flex flex-col md:flex-row min-h-screen">
+    <main class="flex-1 min-w-0 p-6 md:p-10 flex flex-col">
+        <div class="max-w-5xl w-full flex flex-col flex-1">
+            <h2 class="text-3xl font-extrabold text-gray-900">Tanya Desa (Chatbot AI)</h2>
+            <p class="text-gray-600 mb-6">Asisten virtual untuk informasi seputar UMKM dan Desa Paseban Kawis.</p>
 
-    <%- include('../partials/publik-sidebar') %>
+            <!-- Kotak percakapan -->
+            <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 flex flex-col flex-1 min-h-[480px]">
 
-    <main class="flex-1 p-8 flex flex-col h-screen">
-        <header class="mb-4">
-            <h2 class="text-2xl font-bold text-gray-800">Tanya Desa (Chatbot AI)</h2>
-            <p class="text-gray-600">Asisten virtual untuk informasi seputar UMKM dan Desa Paseban Kawis.</p>
-        </header>
-
-        <!-- Kotak Percakapan Chatbot -->
-        <div class="bg-white border border-gray-200 rounded-2xl flex-1 flex flex-col justify-between p-6 shadow-sm overflow-hidden mb-4">
-            <!-- Area Pesan Masuk/Keluar -->
-            <div class="space-y-4 overflow-y-auto pr-2">
-                <!-- Pesan Bot -->
-                <div class="flex items-start gap-3">
-                    <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-sm shrink-0">AI</div>
-                    <div class="bg-gray-100 rounded-xl p-4 text-sm text-gray-700 max-w-md">
-                        Halo! Ada yang bisa saya bantu terkait produk UMKM, lokasi usaha, atau informasi menarik di Desa Paseban Kawis?
+                <!-- Area pesan -->
+                <div id="chat-messages" class="flex-1 overflow-y-auto space-y-4 pr-2">
+                    <!-- Pesan bot -->
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-full bg-emerald-100 text-[#065F46] flex items-center justify-center font-bold text-sm shrink-0">AI</div>
+                        <div class="bg-emerald-50 text-emerald-900 rounded-2xl p-4 text-sm max-w-lg">
+                            Halo! Ada yang bisa saya bantu terkait produk UMKM, lokasi usaha, atau informasi menarik di Desa Paseban Kawis?
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Form Input Pesan Chat -->
-            <div class="mt-4 pt-4 border-t border-gray-100 flex gap-2">
-                <input type="text" placeholder="Ketik pertanyaanmu di sini..." class="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                <button type="button" class="bg-emerald-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">Kirim</button>
+                <!-- Input pesan -->
+                <div class="mt-4 pt-4 border-t border-gray-100 flex gap-2">
+                    <input type="text" placeholder="Ketik pertanyaanmu di sini..." aria-label="Pertanyaan untuk chatbot"
+                           class="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-700">
+                    <button type="button" class="bg-[#065F46] hover:bg-emerald-900 text-white px-6 py-3 rounded-xl text-sm font-bold transition">Kirim</button>
+                </div>
             </div>
         </div>
     </main>
-
+</div>
 <%- include('../partials/footer') %>
-</body>

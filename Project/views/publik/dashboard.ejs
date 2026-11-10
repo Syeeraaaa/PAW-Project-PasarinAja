@@ -1,27 +1,39 @@
 <!-- views/publik/dashboard.ejs -->
+<%
+  const menu = [
+    { href: '/katalog', judul: 'E-Katalog', ket: 'Lihat produk UMKM' },
+    { href: '/chatbot', judul: 'Chatbot AI', ket: 'Tanya AI' },
+    { href: '/login', judul: 'Masuk', ket: 'Untuk pelaku UMKM dan admin' },
+  ];
+%>
 <%- include('../partials/head', { title: `Dashboard - ${appName}` }) %>
+<body class="bg-gray-50 text-gray-800 font-sans">
+<div class="min-h-screen flex flex-col md:flex-row">
+    <%- include('../partials/publik-sidebar', { aktif: 'dashboard' }) %>
 
-<body class="bg-gray-50 flex flex-col md:flex-row min-h-screen">
+    <main class="flex-1 min-w-0 p-6 md:p-10">
+        <div class="max-w-5xl">
+            <h2 class="text-3xl font-extrabold text-gray-900">Selamat Datang di <%= appName %></h2>
+            <p class="text-gray-600 mb-8">Pusat katalog produk UMKM resmi Desa Paseban Kawis.</p>
 
-    <!-- Sidebar Publik -->
-    <%- include('../partials/publik-sidebar') %>
+            <!-- Hero -->
+            <div class="bg-[#065F46] rounded-3xl p-8 md:p-10 text-white shadow-sm mb-8">
+                <h3 class="text-3xl font-extrabold mb-3">Dukung Produk Lokal Berkualitas</h3>
+                <p class="text-emerald-100 mb-6 max-w-xl">Temukan berbagai hasil kerajinan tangan, olahan makanan khas, hingga produk pertanian langsung dari tangan pelaku UMKM desa.</p>
+                <a href="/katalog" class="inline-block bg-white text-[#065F46] font-bold px-6 py-2.5 rounded-xl hover:bg-emerald-50 transition">Jelajahi Katalog</a>
+            </div>
 
-    <!-- Konten Utama -->
-    <main class="flex-1 p-8">
-        <header class="mb-8">
-            <h2 class="text-2xl font-bold text-gray-800">Selamat Datang di <%= appName %></h2>
-            <p class="text-gray-600">Pusat katalog produk UMKM resmi Desa Paseban Kawis.</p>
-        </header>
-
-        <!-- Banner Sambutan / Hero Section -->
-        <div class="bg-emerald-600 rounded-2xl p-8 text-white shadow-sm mb-8">
-            <h3 class="text-3xl font-bold mb-2">Dukung Produk Lokal Berkualitas</h3>
-            <p class="text-emerald-100 mb-6 max-w-xl">Temukan berbagai hasil kerajinan tangan, olahan makanan khas, hingga produk pertanian langsung dari tangan pelaku UMKM desa.</p>
-            <a href="/katalog" class="inline-block bg-white text-emerald-600 font-semibold px-6 py-2.5 rounded-lg shadow hover:bg-emerald-50 transition-colors">
-                Jelajahi Katalog
-            </a>
+            <!-- Menu utama -->
+            <h3 class="font-bold mb-3">Menu Utama</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <% menu.forEach(function (m) { %>
+                    <a href="<%= m.href %>" class="block bg-gray-100 hover:bg-emerald-50 border border-transparent hover:border-emerald-300 rounded-3xl p-6 transition">
+                        <h4 class="font-bold"><%= m.judul %></h4>
+                        <p class="text-gray-600 mt-2 text-sm"><%= m.ket %></p>
+                    </a>
+                <% }); %>
+            </div>
         </div>
     </main>
-
+</div>
 <%- include('../partials/footer') %>
-</body>
