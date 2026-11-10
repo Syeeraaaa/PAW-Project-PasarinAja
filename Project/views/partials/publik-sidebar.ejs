@@ -1,4 +1,5 @@
 <%
+  const aktifKey = typeof aktif !== 'undefined' ? aktif : '';
   const menu = [
     { key: 'dashboard', href: '/', label: 'Dashboard' },
     { key: 'katalog', href: '/katalog', label: 'E-Katalog' },
@@ -12,9 +13,12 @@
         <h1 class="text-lg font-extrabold tracking-wide mb-8">PASEBAN KAWIS</h1>
         <nav class="space-y-2">
             <% menu.forEach(function (m) { %>
-                <a href="<%= m.href %>" class="block px-4 py-2.5 rounded-xl transition <%= aktif === m.key ? aktifCls : biasaCls %>"><%= m.label %></a>
+                <a href="<%= m.href %>" class="block px-4 py-2.5 rounded-xl transition <%= aktifKey === m.key ? aktifCls : biasaCls %>"><%= m.label %></a>
             <% }); %>
         </nav>
     </div>
-    <a href="/login" class="block px-4 py-2.5 rounded-xl transition mt-6 hover:bg-emerald-800/60 font-medium">Masuk sebagai UMKM</a>
+    <div class="mt-6 pt-4 border-t border-emerald-800 space-y-2">
+        <a href="/login" class="block px-4 py-2.5 rounded-xl transition hover:bg-emerald-800/60 font-medium">Masuk</a>
+        <a href="/register" class="block px-4 py-2.5 rounded-xl transition hover:bg-emerald-800/60 font-medium">Daftar</a>
+    </div>
 </aside>
