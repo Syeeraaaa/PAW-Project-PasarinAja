@@ -1,6 +1,7 @@
 const sequelize = require('../config/database');
 const { Product } = require('../models/productModel');
 const { Umkm } = require('../models/umkmModel');
+const userModel = require('../models/userModel');
 
 const WA = '6281234567890'; // ganti dengan nomor WhatsApp asli
 
@@ -32,7 +33,9 @@ const data = [
       { nama: 'Sambal Kemasan', kategori: 'Makanan & Minuman', harga: 35000, stok: 20, deskripsi: 'Sambal kemasan dalam tiga varian favorit.', umkm: aktif.nama_usaha, umkm_id: aktif.id, no_whatsapp: aktif.no_whatsapp, gambar: '/images/sambal.jpg', status: 'ditampilkan' },
       { nama: 'Kerupuk Seblak Campur', kategori: 'Makanan & Minuman', harga: 20000, stok: 20, deskripsi: 'Kerupuk seblak campur siap seduh.', umkm: aktif.nama_usaha, umkm_id: aktif.id, no_whatsapp: aktif.no_whatsapp, gambar: '/images/seblak.jpg', status: 'menunggu' },
     ]);
-
+    await userModel.create({ username: 'admin', email: 'admin@pasarinaja.local', password: 'admin12345', role: 'admin' });
+    await userModel.create({ username: 'umkm', email: 'umkm@pasarinaja.local', password: 'umkm12345', role: 'umkm', umkm_id: aktif.id });
+    
     console.log('Seed selesai');
   } catch (err) {
     console.error('Seed gagal:', err.message);
