@@ -1,34 +1,94 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrasi Pelaku UMKM - Paseban Kawis</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { theme: { extend: { colors: { primary: '#065F46' } } } }
-    </script>
-</head>
-<body class="bg-primary min-h-screen flex items-center justify-center p-6">
-    <div class="bg-white rounded-3xl p-8 md:p-12 shadow-2xl w-full max-w-md">
-        <h2 class="text-3xl font-extrabold text-primary text-center mb-8">Registrasi</h2>
-        <form action="/register" method="POST" class="space-y-5">
+<%
+  const gambar = '/images/register.jpg'; // ganti dengan nama file gambar di public/images
+  const input = 'w-full border rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-700';
+  const warna = (nama) => (errors[nama] ? 'border-red-500' : 'border-gray-300');
+%>
+<%- include('../partials/head', { title: `Registrasi - ${appName}` }) %>
+<body class="font-sans text-gray-800">
+<!-- Gambar dijadikan background full layar -->
+<div class="min-h-screen flex items-center justify-center bg-emerald-900 bg-cover bg-center p-4 sm:p-6 relative" 
+     style="background-image: url('<%= gambar %>');">
+    
+    <!-- Overlay gelap sedikit agar form lebih menonjol -->
+    <div class="absolute inset-0 bg-black/30"></div>
+
+    <!-- Card Form -->
+    <div class="relative w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 sm:p-8">
+        <a href="/" class="text-xs text-emerald-700 hover:underline">&larr; Kembali ke beranda</a>
+        <h1 class="text-3xl font-extrabold text-[#17714A] text-center mt-3 mb-6">Registrasi</h1>
+
+        <form id="form-register" method="POST" action="/register" novalidate class="space-y-4">
             <div>
-                <input type="text" name="username" placeholder="Masukkan Username" required class="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl px-5 py-4 text-base focus:outline-none focus:border-primary">
+                <label for="username" class="text-sm font-medium">Username</label>
+                <input id="username" name="username" value="<%= username %>" autocomplete="username" placeholder="Contoh: sambal_bu_sari" class="<%= input %> <%= warna('username') %>">
+                <p data-untuk="username" class="<%= errors.username ? '' : 'hidden' %> text-xs text-red-600 mt-1"><%= errors.username || '' %></p>
             </div>
             <div>
-                <input type="email" name="email" placeholder="Masukkan Email" required class="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl px-5 py-4 text-base focus:outline-none focus:border-primary">
+                <label for="email" class="text-sm font-medium">Email</label>
+                <input id="email" name="email" type="email" value="<%= email %>" autocomplete="email" placeholder="nama@email.com" class="<%= input %> <%= warna('email') %>">
+                <p data-untuk="email" class="<%= errors.email ? '' : 'hidden' %> text-xs text-red-600 mt-1"><%= errors.email || '' %></p>
             </div>
             <div>
-                <input type="password" name="password" placeholder="Masukkan Password" required class="w-full bg-gray-50 border-2 border-gray-200 rounded-2xl px-5 py-4 text-base focus:outline-none focus:border-primary">
+                <label for="password" class="text-sm font-medium">Password</label>
+                <input id="password" name="password" type="password" autocomplete="new-password" placeholder="Minimal 8 karakter" class="<%= input %> <%= warna('password') %>">
+                <p data-untuk="password" class="<%= errors.password ? '' : 'hidden' %> text-xs text-red-600 mt-1"><%= errors.password || '' %></p>
             </div>
-            <button type="submit" class="w-full bg-primary text-white font-bold py-4 rounded-2xl text-lg hover:bg-emerald-900 transition shadow-md">
-                Daftar
-            </button>
+            <button class="w-full bg-[#17714A] hover:bg-emerald-900 text-white font-bold py-3 rounded-xl transition">Daftar</button>
         </form>
-        <p class="text-center text-gray-600 text-sm mt-6">
-            Sudah punya akun? <a href="/login" class="text-primary font-bold hover:underline">Login</a>
-        </p>
+
+        <p class="text-center text-sm mt-6">Sudah punya akun? <a href="/login" class="font-bold underline text-[#17714A]">Login</a></p>
     </div>
+</div>
+<script>
+    (function () {
+        var form = document.getElementById('form-register');
+
+        var aturan = {
+            username: function (v) {
+                v = v.trim();
+                if (!v) return 'Username wajib diisi';
+                if (!/^[A-Za-z0-9_]{3,30}$/.test(v)) return 'Username 3-30 karakter: huruf, angka, atau underscore';
+                return '';
+            },
+            email: function (v) {
+                v = v.trim();
+                if (!v) return 'Email wajib diisi';
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) return 'Format email tidak valid';
+                return '';
+            },
+            password: function (v) {
+                if (!v) return 'Password wajib diisi';
+                if (v.length < 8) return 'Password minimal 8 karakter';
+                if (v.length > 72) return 'Password maksimal 72 karakter';
+                return '';
+            }
+        };
+
+        function tampilkan(nama, pesan) {
+            var teks = form.querySelector('[data-untuk="' + nama + '"]');
+            var input = form.elements[nama];
+            teks.textContent = pesan;
+            teks.classList.toggle('hidden', !pesan);
+            input.classList.toggle('border-red-500', !!pesan);
+            input.classList.toggle('border-gray-300', !pesan);
+        }
+
+        function cek(nama) {
+            var pesan = aturan[nama](form.elements[nama].value);
+            tampilkan(nama, pesan);
+            return !pesan;
+        }
+
+        Object.keys(aturan).forEach(function (nama) {
+            form.elements[nama].addEventListener('blur', function () { cek(nama); });
+        });
+
+        form.addEventListener('submit', function (e) {
+            var semuaOk = true;
+            Object.keys(aturan).forEach(function (nama) { if (!cek(nama)) semuaOk = false; });
+            if (!semuaOk) e.preventDefault();
+        });
+    })();
+</script>
 </body>
 </html>
