@@ -1,61 +1,68 @@
 <%
   const input = 'w-full bg-gray-200 rounded-full px-5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-700';
+  const labelStatus = { menunggu: 'Menunggu verifikasi admin', disetujui: 'Disetujui', ditolak: 'Ditolak' };
 %>
 <%- include('../partials/head', { appName: appName }) %>
 <body class="bg-gray-50 text-gray-800 font-sans">
 <div class="min-h-screen flex flex-col md:flex-row">
-    <%- include('../partials/umkm-sidebar', { aktif: 'pendaftaran' }) %>
+    <%- include('../partials/sidebar', { aktif: 'pendaftaran' }) %>
 
-    <main class="flex-1 p-6 md:p-10 flex justify-center">
-        <div class="w-full max-w-xl bg-gray-100 border border-gray-300 rounded-3xl p-8 h-fit">
+    <main class="flex-1 min-w-0 p-4 sm:p-6 md:p-10 flex justify-center">
+        <div class="w-full max-w-xl bg-gray-100 border border-gray-300 rounded-3xl p-5 sm:p-8 h-fit">
             <h2 class="text-2xl font-extrabold text-center">Form Pendaftaran UMKM</h2>
             <p class="text-sm text-center mb-6">Isi data untuk bergabung</p>
 
-            <% if (berhasil) { %>
-                <div class="bg-emerald-100 text-emerald-800 text-sm font-semibold rounded-xl p-3 mb-5">
-                    Data terkirim! Pendaftaran kamu akan diverifikasi admin.
+            <% if (umkm) { %>
+                <% if (berhasil) { %>
+                    <div class="bg-emerald-100 text-emerald-800 text-sm font-semibold rounded-xl p-3 mb-5">Data terkirim! Pendaftaran kamu akan diverifikasi admin.</div>
+                <% } %>
+                <div class="rounded-2xl p-5 text-center <%= umkm.status === 'disetujui' ? 'bg-emerald-100 text-emerald-800' : (umkm.status === 'ditolak' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-800') %>">
+                    <p class="font-bold"><%= umkm.nama_usaha %></p>
+                    <p class="text-sm mt-1">Status pendaftaran: <b><%= labelStatus[umkm.status] %></b></p>
+                    <% if (umkm.status === 'ditolak') { %>
+                        <a href="/umkm/akun" class="inline-block mt-3 underline text-sm">Perbarui data di Akun Saya</a>
+                    <% } %>
                 </div>
-            <% } %>
-
-            <form method="POST" action="/umkm/pendaftaran" enctype="multipart/form-data" class="space-y-4">
-                <div>
-                    <label class="text-sm font-medium">Nama Lengkap</label>
-                    <input name="nama_pemilik" placeholder="Contoh: Siti Aminah" required class="<%= input %>">
-                </div>
-                <div>
-                    <label class="text-sm font-medium">Email</label>
-                    <input name="email" type="email" placeholder="nama@email.com" class="<%= input %>">
-                </div>
-                <div>
-                    <label class="text-sm font-medium">Nama UMKM / Usaha</label>
-                    <input name="nama_usaha" placeholder="Contoh: Keripik Singkong Mak Nyus" required class="<%= input %>">
-                </div>
-                <div>
-                    <label class="text-sm font-medium">No. WhatsApp</label>
-                    <input name="no_whatsapp" placeholder="Contoh: 6281234567890" class="<%= input %>">
-                </div>
-                <div>
-                    <label class="text-sm font-medium">Kategori Usaha</label>
-                    <select name="kategori" required class="<%= input %>">
-                        <option value="" disabled selected>Pilih Kategori</option>
-                        <% kategori.forEach(function (k) { %><option value="<%= k %>"><%= k %></option><% }); %>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-sm font-medium">Foto UMKM / Produk</label>
-                    <div class="relative bg-gray-200 rounded-2xl py-6 text-center hover:bg-gray-300 transition">
-                        <p id="nama-file" class="text-sm font-medium">Tarik foto ke sini atau pilih file</p>
-                        <p class="text-xs text-gray-500">JPG atau PNG, maksimal 2 MB</p>
-                        <input type="file" name="foto" accept="image/png,image/jpeg" onchange="cekFoto(this)"
-                               class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+            <% } else { %>
+                <form method="POST" action="/umkm/pendaftaran" enctype="multipart/form-data" class="space-y-4">
+                    <div>
+                        <label class="text-sm font-medium">Nama Lengkap</label>
+                        <input name="nama_pemilik" placeholder="Contoh: Siti Aminah" required class="<%= input %>">
                     </div>
-                </div>
-                <div>
-                    <label class="text-sm font-medium">Pesan / Keterangan</label>
-                    <textarea name="pesan" rows="3" placeholder="Ceritakan singkat usaha anda" class="w-full bg-gray-200 rounded-2xl px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-700"></textarea>
-                </div>
-                <button class="w-full bg-[#065F46] hover:bg-emerald-800 text-white font-extrabold py-3 rounded-xl">Kirim Data</button>
-            </form>
+                    <div>
+                        <label class="text-sm font-medium">Email</label>
+                        <input value="<%= emailUser %>" readonly class="<%= input %> opacity-70">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Nama UMKM / Usaha</label>
+                        <input name="nama_usaha" placeholder="Contoh: Keripik Singkong Mak Nyus" required class="<%= input %>">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">No. WhatsApp</label>
+                        <input name="no_whatsapp" placeholder="Contoh: 6281234567890" class="<%= input %>">
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Kategori Usaha</label>
+                        <select name="kategori" required class="<%= input %>">
+                            <option value="" disabled selected>Pilih Kategori</option>
+                            <% kategori.forEach(function (k) { %><option value="<%= k %>"><%= k %></option><% }); %>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Foto UMKM / Produk</label>
+                        <div class="relative bg-gray-200 rounded-2xl py-6 text-center hover:bg-gray-300 transition">
+                            <p id="nama-file" class="text-sm font-medium px-2 break-all">Tarik foto ke sini atau pilih file</p>
+                            <p class="text-xs text-gray-500">JPG atau PNG, maksimal 2 MB</p>
+                            <input type="file" name="foto" accept="image/png,image/jpeg" onchange="cekFoto(this)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium">Pesan / Keterangan</label>
+                        <textarea name="pesan" rows="3" placeholder="Ceritakan singkat usaha anda" class="w-full bg-gray-200 rounded-2xl px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-700"></textarea>
+                    </div>
+                    <button class="w-full bg-[#065F46] hover:bg-emerald-800 text-white font-extrabold py-3 rounded-xl">Kirim Data</button>
+                </form>
+            <% } %>
         </div>
     </main>
 </div>

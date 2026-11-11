@@ -12,7 +12,7 @@
 <%- include('../partials/head', { appName: appName }) %>
 <body class="bg-gray-50 text-gray-800 font-sans">
 <div class="min-h-screen flex flex-col md:flex-row">
-    <%- include('../partials/admin-sidebar', { aktif: 'produk' }) %>
+    <%- include('../partials/sidebar', { aktif: 'produk' }) %>
 
     <main class="flex-1 p-6 md:p-10">
         <h2 class="text-3xl font-extrabold text-gray-900">Data Produk</h2>
@@ -58,7 +58,7 @@
                         <div class="flex flex-wrap items-center gap-3 text-sm">
                             <span class="<%= badge[p.status] %> text-xs font-bold px-3 py-1.5 rounded-full"><%= label[p.status] %></span>
 
-                            <% if (p.status !== 'ditampilkan') { %>
+                           <% if (p.status === 'menunggu') { %>
                                 <form method="POST" action="/admin/produk/<%= p.id %>/verifikasi">
                                     <button class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-3 py-1.5 rounded-lg">Verifikasi</button>
                                 </form>

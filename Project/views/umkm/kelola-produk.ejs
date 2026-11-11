@@ -2,11 +2,11 @@
   const badge = { menunggu: 'bg-amber-100 text-amber-700', ditampilkan: 'bg-emerald-100 text-emerald-700', ditolak: 'bg-red-100 text-red-700' };
   const label = { menunggu: 'Menunggu verifikasi', ditampilkan: 'Ditampilkan', ditolak: 'Ditolak' };
   const input = 'w-full border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-700';
-%>
+   %>
 <%- include('../partials/head', { appName: appName }) %>
 <body class="bg-gray-50 text-gray-800 font-sans">
 <div class="min-h-screen flex flex-col md:flex-row">
-    <%- include('../partials/umkm-sidebar', { aktif: 'kelola' }) %>
+    <%- include('../partials/sidebar', { aktif: 'kelola' }) %>
 
     <main class="flex-1 p-6 md:p-10 max-w-5xl">
         <h2 class="text-3xl font-extrabold text-gray-900">Kelola Produk</h2>
@@ -61,6 +61,9 @@
                                     <p class="text-sm"><%= formatRupiah(p.harga) %></p>
                                     <p class="text-sm text-gray-500">Stok: <%= p.stok %></p>
                                     <span class="<%= badge[p.status] %> text-xs font-bold px-2.5 py-1 rounded-full inline-block mt-1"><%= label[p.status] %></span>
+                                    <% if (p.status === 'ditolak') { %>
+                                        <p class="text-xs text-red-600 mt-1">Ditolak admin. Edit lalu simpan untuk mengajukan ulang.</p>
+                                    <% } %>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2">

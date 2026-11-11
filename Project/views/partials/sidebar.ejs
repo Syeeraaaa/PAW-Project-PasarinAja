@@ -1,0 +1,71 @@
+<%
+  const peran = (typeof user !== 'undefined' && user) ? user.role : 'publik';
+  const aktifKey = typeof aktif !== 'undefined' ? aktif : '';
+
+  const daftarMenu = {
+    publik: [
+      { key: 'dashboard', href: '/', label: 'Dashboard' },
+      { key: 'katalog', href: '/katalog', label: 'E-Katalog' },
+      { key: 'chatbot', href: '/chatbot', label: 'Chatbot AI' },
+    ],
+    umkm: [
+      { key: 'dashboard', href: '/umkm/dashboard', label: 'Dashboard' },
+      { key: 'katalog', href: '/katalog', label: 'E-Katalog' },
+      { key: 'kelola', href: '/umkm/produk', label: 'Kelola Produk' },
+      { key: 'chatbot', href: '/chatbot', label: 'Chatbot AI' },
+      { key: 'pendaftaran', href: '/umkm/pendaftaran', label: 'Form Pendaftaran' },
+    ],
+    admin: [
+      { key: 'dashboard', href: '/admin/dashboard', label: 'Dashboard' },
+      { key: 'umkm', href: '/admin/umkm', label: 'Data UMKM' },
+      { key: 'produk', href: '/admin/produk', label: 'Data Produk' },
+    ],
+  };
+  const menu = daftarMenu[peran];
+  const hrefAkun = peran === 'admin' ? '/admin/akun' : '/umkm/akun';
+  const aktifCls = 'bg-emerald-700 font-bold';
+  const biasaCls = 'hover:bg-emerald-800/60 font-medium';
+%>
+
+<!-- Bar atas (hanya di layar kecil) -->
+<header class="md:hidden sticky top-0 z-30 flex items-center justify-between bg-[#065F46] text-white px-4 py-3">
+    <span class="font-extrabold tracking-wide">PASEBAN KAWIS</span>
+    <button type="button" id="tombol-menu" aria-label="Buka menu" aria-expanded="false" aria-controls="menu-samping"
+            class="p-2 rounded-lg hover:bg-emerald-800">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+</header>
+
+<!-- Sidebar: tersembunyi di HP sampai tombol menu ditekan, selalu tampil di layar besar -->
+<aside id="menu-samping"
+       class="hidden md:flex flex-col justify-between bg-[#065F46] text-white p-5 md:w-60 md:shrink-0 md:sticky md:top-0 md:h-screen md:self-start md:overflow-y-auto">
+    <div>
+        <h1 class="hidden md:block text-lg font-extrabold tracking-wide mb-8">PASEBAN KAWIS</h1>
+        <nav class="space-y-2">
+            <% menu.forEach(function (m) { %>
+                <a href="<%= m.href %>" class="block px-4 py-2.5 rounded-xl transition <%= aktifKey === m.key ? aktifCls : biasaCls %>"><%= m.label %></a>
+            <% }); %>
+        </nav>
+    </div>
+
+    <div class="mt-6 pt-4 border-t border-emerald-800 space-y-2">
+        <% if (peran === 'publik') { %>
+            <a href="/login" class="block px-4 py-2.5 rounded-xl transition <%= biasaCls %>">Masuk</a>
+            <a href="/register" class="block px-4 py-2.5 rounded-xl transition <%= biasaCls %>">Daftar</a>
+        <% } else { %>
+            <a href="<%= hrefAkun %>" class="block px-4 py-2.5 rounded-xl transition <%= aktifKey === 'akun' ? aktifCls : biasaCls %>">Akun Saya</a>
+            <a href="/logout" onclick="return confirm('Yakin ingin keluar?')" class="block px-4 py-2.5 rounded-xl transition <%= biasaCls %>">Keluar</a>
+        <% } %>
+    </div>
+</aside>
+
+<script>
+    (function () {
+        var tombol = document.getElementById('tombol-menu');
+        var menu = document.getElementById('menu-samping');
+        tombol.addEventListener('click', function () {
+            var tersembunyi = menu.classList.toggle('hidden');
+            tombol.setAttribute('aria-expanded', String(!tersembunyi));
+        });
+    })();
+</script>

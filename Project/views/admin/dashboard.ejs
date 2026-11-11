@@ -5,7 +5,7 @@
 <%- include('../partials/head', { appName: appName }) %>
 <body class="bg-gray-50 text-gray-800 font-sans">
 <div class="min-h-screen flex flex-col md:flex-row">
-    <%- include('../partials/admin-sidebar', { aktif: 'dashboard' }) %>
+    <%- include('../partials/sidebar', { aktif: 'dashboard' }) %>
 
     <main class="flex-1 p-6 md:p-10">
         <h2 class="text-3xl font-extrabold text-gray-900">Dashboard Admin</h2>
@@ -59,6 +59,9 @@
                             <% if (u.status === 'menunggu') { %>
                                 <form method="POST" action="/admin/umkm/<%= u.id %>/verifikasi">
                                     <button class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-4 py-2 rounded-xl text-sm">Verifikasi</button>
+                                </form>
+                                <form method="POST" action="/admin/umkm/<%= u.id %>/tolak">
+                                    <button class="bg-red-100 hover:bg-red-200 text-red-700 font-bold px-4 py-2 rounded-xl text-sm">Tolak</button>
                                 </form>
                             <% } %>
                             <a href="/admin/umkm#detail-<%= u.id %>" class="border border-emerald-700 text-emerald-700 hover:bg-emerald-50 font-bold px-4 py-2 rounded-xl text-sm">Detail</a>
