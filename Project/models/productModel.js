@@ -178,15 +178,8 @@ async function searchPublic(keyword) {
   return semua.filter((p) => p.status === 'ditampilkan');
 }
 
-// Samakan nama usaha dan nomor WhatsApp di semua produk milik satu UMKM
-async function syncUmkm(umkmId, { umkm, no_whatsapp }) {
-  const idAngka = Number(umkmId);
-  if (isNaN(idAngka)) return; // Cegah error kalau ID tidak valid
-
-  await Product.update(
-    { umkm, no_whatsapp }, 
-    { where: { umkm_id: idAngka } }
-  );
+async function removeByUmkm(umkmId) {
+  await Product.destroy({ where: { umkm_id: umkmId } });
 }
 
 module.exports = {
@@ -202,5 +195,5 @@ module.exports = {
   remove,
   getByUmkm,
   searchPublic,
-  syncUmkm,
+  removeByUmkm,
 };
