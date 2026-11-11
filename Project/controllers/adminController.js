@@ -100,6 +100,7 @@ exports.hapusUmkm = async (req, res, next) => {
   try {
     const hasil = await umkmModel.remove(req.params.id);
     if (!hasil) return res.status(404).send('UMKM tidak ditemukan');
+    await produkModel.removeByUmkm(req.params.id); // produk milik UMKM ikut terhapus
     kembali(req, res, '/admin/umkm');
   } catch (error) {
     next(error);
@@ -166,6 +167,5 @@ exports.hapusProduk = async (req, res, next) => {
 
 // ---------- AKUN ----------
 exports.renderAkunAdmin = (req, res) => {
-  // TODO: ambil dari session setelah login sungguhan dibuat
-  res.render('admin/akun', { appName: config.appName, admin: { username: 'admin' } });
+  res.render('admin/akun', { appName: config.appName, admin: req.user });
 };

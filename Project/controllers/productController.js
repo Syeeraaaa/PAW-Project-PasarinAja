@@ -8,10 +8,10 @@ const { formatRupiah } = require('../utils/formatter');
 
 // Menampilkan Halaman Dashboard Publik
 const renderDashboard = (req, res) => {
-    res.render('publik/dashboard', { 
-        appName: config.appName, 
-        aktif: 'dashboard' // Indikator menu aktif di sidebar
-    });
+  if (req.user) {
+    return res.redirect(req.user.role === 'admin' ? '/admin/dashboard' : '/umkm/dashboard');
+  }
+  res.render('publik/dashboard', { appName: config.appName });
 };
 
 // Menampilkan Halaman Katalog Produk dengan Pencarian & Status Valid

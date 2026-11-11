@@ -2,12 +2,12 @@
 const config = require('../config/config');
 const umkmModel = require('../models/umkmModel');
 const produkModel = require('../models/productModel');
+const userModel = require('../models/userModel');
 const { formatRupiah } = require('../utils/formatter');
 
 const angkaValid = (v) =>
   v !== undefined && String(v).trim() !== '' && Number.isFinite(Number(v)) && Number(v) >= 0;
 
-// Foto hasil upload disimpan sebagai path yang bisa dibuka dari browser
 const pathFoto = (file) => (file ? `/uploads/${file.filename}` : undefined);
 
 // Produk hanya boleh diubah atau dihapus oleh UMKM pemiliknya
@@ -17,8 +17,27 @@ const ambilProdukMilik = async (id, umkmId) => {
 };
 
 // ---------- DASHBOARD ----------
-exports.renderDashboard = (req, res) => {
-  res.render('umkm/dashboard', { appName: config.appName, umkm: req.umkm });
+exports.renderDashboard = async (req, res, next) => {
+  try {
+    let ringkasan = { total: 0, ditampilkan: 0, menunggu: 0, ditolak: 0 };
+    let ditolak = [];
+
+    if (req.umkm) {
+      const produk = await produkModel.getByUmkm(req.umkm.id);
+      const hitung = (status) => produk.filter((p) => p.status === status).length;
+      ringkasan = {
+        total: produk.length,
+        ditampilkan: hitung('ditampilkan'),
+        menunggu: hitung('menunggu'),
+        ditolak: hitung('ditolak'),
+      };
+      ditolak = produk.filter((p) => p.status === 'ditolak');
+    }
+
+    res.render('umkm/dashboard', { appName: config.appName, umkm: req.umkm, ringkasan, ditolak });
+  } catch (error) {
+    next(error);
+  }
 };
 
 // ---------- KELOLA PRODUK (CRUD) ----------
@@ -68,8 +87,8 @@ exports.ubahProduk = async (req, res, next) => {
     }
     await produkModel.update(req.params.id, {
       nama, kategori, harga, stok, deskripsi,
-      ...(req.file && { gambar: pathFoto(req.file) }), // foto lama dipakai kalau tidak ganti
-      // produk yang ditolak dan diperbaiki diajukan lagi ke admin
+      ...(req.file && { gambar: pathFoto(req.file) }),
+      // produk yang ditolak lalu diperbaiki diajukan ulang ke admin
       status: produk.status === 'ditolak' ? 'menunggu' : produk.status,
     });
     res.redirect('/umkm/produk');
@@ -95,20 +114,26 @@ exports.renderFormPendaftaran = (req, res) => {
     appName: config.appName,
     kategori: produkModel.getCategories(),
     berhasil: req.query.berhasil === '1',
+    umkm: req.umkm,
+    emailUser: req.user.email,
   });
 };
 
 exports.storePendaftaran = async (req, res, next) => {
   try {
-    const { nama_pemilik, email, nama_usaha, no_whatsapp, kategori, pesan } = req.body;
+    if (req.umkm) return res.redirect('/umkm/pendaftaran'); // satu akun, satu UMKM
+
+    const { nama_pemilik, nama_usaha, no_whatsapp, kategori, pesan } = req.body;
     if (!nama_pemilik || !nama_usaha || !kategori) {
       return res.status(400).send('Nama lengkap, nama usaha, dan kategori wajib diisi');
     }
-    await umkmModel.create({
-      nama_pemilik, email, nama_usaha, no_whatsapp, kategori, pesan,
+    const baru = await umkmModel.create({
+      nama_pemilik, nama_usaha, no_whatsapp, kategori, pesan,
+      email: req.user.email, // email diambil dari akun
       foto: pathFoto(req.file),
-      status: 'menunggu', // menunggu verifikasi admin
+      status: 'menunggu',
     });
+    await userModel.setUmkm(req.user.id, baru.id);
     res.redirect('/umkm/pendaftaran?berhasil=1');
   } catch (error) {
     next(error);
@@ -122,12 +147,17 @@ exports.renderAkun = (req, res) => {
 
 exports.ubahAkun = async (req, res, next) => {
   try {
-    const { nama_pemilik, nama_usaha, email, no_whatsapp } = req.body;
+    if (!req.umkm) return res.redirect('/umkm/pendaftaran');
+
+    const { nama_pemilik, nama_usaha, no_whatsapp } = req.body;
     if (!nama_pemilik || !nama_usaha) {
       return res.status(400).send('Nama lengkap dan nama usaha wajib diisi');
     }
-    await umkmModel.update(req.umkm.id, { nama_pemilik, nama_usaha, email, no_whatsapp });
-    // nama usaha dan WhatsApp juga dipakai di produk, jadi disamakan
+    await umkmModel.update(req.umkm.id, {
+      nama_pemilik, nama_usaha, no_whatsapp,
+      // pendaftaran yang ditolak, setelah diperbaiki, diajukan ulang
+      ...(req.umkm.status === 'ditolak' && { status: 'menunggu' }),
+    });
     await produkModel.syncUmkm(req.umkm.id, { umkm: nama_usaha, no_whatsapp });
     res.redirect('/umkm/akun');
   } catch (error) {
