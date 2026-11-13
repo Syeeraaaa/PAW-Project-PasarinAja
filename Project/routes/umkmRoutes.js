@@ -1,28 +1,30 @@
 const express = require('express');
 const router = express.Router();
 const umkm = require('../controllers/umkmController');
-const umkmAktif = require('../middlewares/umkmAktif');
+const { wajibRole, muatUmkm, wajibUmkmDisetujui } = require('../middlewares/auth');
 const { uploadFoto } = require('../middlewares/upload');
 
-// ID di URL harus angka
 router.param('id', (req, res, next, id) => {
   if (!/^\d+$/.test(id)) return res.status(404).send('ID tidak valid');
   next();
 });
 
-// Form pendaftaran (tidak butuh UMKM aktif)
-router.get('/umkm/pendaftaran', umkm.renderFormPendaftaran);
-router.post('/umkm/pendaftaran', uploadFoto('foto'), umkm.storePendaftaran);
+// Semua halaman UMKM: harus login sebagai umkm, data UMKM-nya dimuat ke req.umkm
+const hanyaUmkm = [wajibRole('umkm'), muatUmkm];
+// Fitur produk: UMKM juga harus sudah disetujui admin
+const umkmDisetujui = [...hanyaUmkm, wajibUmkmDisetujui];
 
-// Halaman pemilik UMKM
-router.get('/umkm/dashboard', umkmAktif, umkm.renderDashboard);
+router.get('/umkm/dashboard', hanyaUmkm, umkm.renderDashboard);
 
-router.get('/umkm/produk', umkmAktif, umkm.renderKelolaProduk);
-router.post('/umkm/produk', umkmAktif, uploadFoto('gambar'), umkm.tambahProduk);
-router.post('/umkm/produk/:id/edit', umkmAktif, uploadFoto('gambar'), umkm.ubahProduk);
-router.post('/umkm/produk/:id/hapus', umkmAktif, umkm.hapusProduk);
+router.get('/umkm/pendaftaran', hanyaUmkm, umkm.renderFormPendaftaran);
+router.post('/umkm/pendaftaran', hanyaUmkm, uploadFoto('foto'), umkm.storePendaftaran);
 
-router.get('/umkm/akun', umkmAktif, umkm.renderAkun);
-router.post('/umkm/akun', umkmAktif, umkm.ubahAkun);
+router.get('/umkm/produk', umkmDisetujui, umkm.renderKelolaProduk);
+router.post('/umkm/produk', umkmDisetujui, uploadFoto('gambar'), umkm.tambahProduk);
+router.post('/umkm/produk/:id/edit', umkmDisetujui, uploadFoto('gambar'), umkm.ubahProduk);
+router.post('/umkm/produk/:id/hapus', umkmDisetujui, umkm.hapusProduk);
+
+router.get('/umkm/akun', hanyaUmkm, umkm.renderAkun);
+router.post('/umkm/akun', hanyaUmkm, umkm.ubahAkun);
 
 module.exports = router;

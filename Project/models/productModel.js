@@ -26,7 +26,6 @@ const Product = sequelize.define(
     gambar: { type: DataTypes.STRING },
     umkm: { type: DataTypes.STRING },
     umkm_id: { type: DataTypes.INTEGER }, 
-    
     no_whatsapp: { type: DataTypes.STRING },
     status: {
       type: DataTypes.ENUM('menunggu', 'ditampilkan', 'ditolak'),
@@ -59,7 +58,9 @@ const ambilKolom = (data = {}) => {
   }
   if (hasil.harga !== undefined) hasil.harga = Number(hasil.harga);
   if (hasil.stok !== undefined) hasil.stok = Number(hasil.stok);
-  if (hasil.umkm_id !== undefined && hasil.umkm_id !== null) hasil.umkm_id = Number(hasil.umkm_id); // Pastikan angka
+  if (hasil.umkm_id !== undefined && hasil.umkm_id !== null && hasil.umkm_id !== '') {
+    hasil.umkm_id = Number(hasil.umkm_id);
+  }
   return hasil;
 };
 
@@ -125,7 +126,6 @@ async function count() {
 
 // ----------------------------------------------------------------
 // CREATE, UPDATE, DELETE
-// (validasi input dilakukan di controller; model hanya mengelola data)
 // ----------------------------------------------------------------
 
 // Tambah produk baru, mengembalikan produk yang tersimpan
@@ -154,13 +154,19 @@ async function remove(id) {
 }
 
 // ----------------------------------------------------------------
-// [TAMBAHAN 3] FUNGSI BARU
+// FUNGSI TAMBAHAN (UMKM)
 // ----------------------------------------------------------------
 
 // Produk milik satu UMKM (halaman Kelola Produk)
 async function getByUmkm(umkmId) {
+  // Pastikan umkmId diubah ke Number agar cocok dengan tipe INTEGER di DB
+  const idAngka = Number(umkmId);
+  
+  // Jika bukan angka yang valid, kembalikan array kosong (mencegah error SQL)
+  if (isNaN(idAngka)) return [];
+
   const daftar = await Product.findAll({ 
-    where: { umkm_id: umkmId }, 
+    where: { umkm_id: idAngka }, 
     order: [['id', 'DESC']] 
   });
   return daftar.map(keObjek);
@@ -172,12 +178,8 @@ async function searchPublic(keyword) {
   return semua.filter((p) => p.status === 'ditampilkan');
 }
 
-// Samakan nama usaha dan nomor WhatsApp di semua produk milik satu UMKM
-async function syncUmkm(umkmId, { umkm, no_whatsapp }) {
-  await Product.update(
-    { umkm, no_whatsapp }, 
-    { where: { umkm_id: umkmId } }
-  );
+async function removeByUmkm(umkmId) {
+  await Product.destroy({ where: { umkm_id: umkmId } });
 }
 
 module.exports = {
@@ -193,5 +195,5 @@ module.exports = {
   remove,
   getByUmkm,
   searchPublic,
-  syncUmkm,
+  removeByUmkm,
 };

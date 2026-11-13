@@ -16,6 +16,9 @@ const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
+const session = require('express-session');
+const { muatUser } = require('./middlewares/auth');
+
 // View engine (EJS)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -24,7 +27,16 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(logger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'rahasia-dev',
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+app.use(muatUser);
+app.use(express.static(path.join(__dirname, 'public'))); // folder public untuk CSS, JS, gambar, dll
+app.use
 
 // Routes
 app.use('/', routes);          // Publik / buyer + API

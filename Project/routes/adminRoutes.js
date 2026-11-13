@@ -1,12 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const admin = require('../controllers/adminController');
+const { wajibRole } = require('../middlewares/auth');
+
 
 // ID di URL harus angka
 router.param('id', (req, res, next, id) => {
   if (!/^\d+$/.test(id)) return res.status(404).send('ID tidak valid');
   next();
 });
+
+router.use('/admin', wajibRole('admin'));
 
 router.get('/admin/dashboard', admin.renderDashboard);
 

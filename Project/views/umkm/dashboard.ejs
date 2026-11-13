@@ -1,39 +1,82 @@
 <%
+  const nama = umkm ? umkm.nama_pemilik : user.username;
+  const status = umkm ? umkm.status : 'belum';
+  const banner = {
+    belum: { cls: 'bg-blue-50 border-blue-100', judul: 'Satu langkah lagi', teks: 'Lengkapi pendaftaran UMKM kamu supaya bisa mulai menjual.', link: '/umkm/pendaftaran', aksi: 'Isi Form Pendaftaran' },
+    menunggu: { cls: 'bg-amber-50 border-amber-100', judul: 'Menunggu verifikasi admin', teks: 'Kelola Produk terbuka setelah pendaftaran kamu disetujui.' },
+    ditolak: { cls: 'bg-red-50 border-red-100', judul: 'Pendaftaran ditolak', teks: 'Perbarui data usaha di Akun Saya, pendaftaran otomatis diajukan ulang.', link: '/umkm/akun', aksi: 'Buka Akun Saya' },
+    disetujui: { cls: 'bg-emerald-50 border-emerald-100', judul: 'Kelola usaha lebih mudah', teks: 'Promosikan produk dan kembangkan UMKM anda!' },
+  }[status];
+  const kartu = [
+    { label: 'Total Produk', nilai: ringkasan.total, cls: 'bg-blue-50 border-blue-100' },
+    { label: 'Ditampilkan', nilai: ringkasan.ditampilkan, cls: 'bg-emerald-50 border-emerald-100' },
+    { label: 'Menunggu', nilai: ringkasan.menunggu, cls: 'bg-amber-50 border-amber-100' },
+    { label: 'Ditolak', nilai: ringkasan.ditolak, cls: 'bg-red-50 border-red-100' },
+  ];
   const menu = [
-    { href: '/katalog', judul: 'E-Katalog', ket: 'Lihat Produk' },
-    { href: '/umkm/akun', judul: 'Akun Saya', ket: 'Informasi pemilik akun' },
+    { href: '/katalog', judul: 'E-Katalog', ket: 'Lihat produk' },
     { href: '/chatbot', judul: 'Chatbot AI', ket: 'Tanya AI' },
-    { href: '/umkm/produk', judul: 'Kelola Produk', ket: 'Pengelolaan Produk' },
+    { href: '/umkm/akun', judul: 'Akun Saya', ket: 'Informasi pemilik akun' },
+    { href: '/umkm/produk', judul: 'Kelola Produk', ket: 'Pengelolaan produk', perluSetuju: true },
   ];
 %>
 <%- include('../partials/head', { appName: appName }) %>
 <body class="bg-gray-50 text-gray-800 font-sans">
 <div class="min-h-screen flex flex-col md:flex-row">
-    <%- include('../partials/umkm-sidebar', { aktif: 'dashboard' }) %>
+    <%- include('../partials/sidebar', { aktif: 'dashboard' }) %>
 
-    <main class="flex-1 p-6 md:p-10 max-w-5xl">
-        <h2 class="text-3xl font-extrabold text-gray-900">Dashboard</h2>
-        <p class="text-gray-600 mb-6">Selamat datang kembali, <%= umkm.nama_pemilik %>!</p>
+    <main class="flex-1 min-w-0 p-4 sm:p-6 md:p-10">
+        <div class="max-w-5xl">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900">Dashboard</h2>
+            <p class="text-gray-600 mb-6">Selamat datang kembali, <%= nama %>!</p>
 
-        <div class="bg-emerald-50 border border-emerald-100 rounded-3xl p-6 mb-8">
-            <h3 class="font-bold text-lg">Kelola usaha lebih mudah</h3>
-            <p class="text-gray-700">Promosikan produk dan kembangkan UMKM anda!</p>
+            <div class="<%= banner.cls %> border rounded-3xl p-5 sm:p-6 mb-6">
+                <h3 class="font-bold text-lg"><%= banner.judul %></h3>
+                <p class="text-gray-700"><%= banner.teks %></p>
+                <% if (banner.link) { %>
+                    <a href="<%= banner.link %>" class="inline-block mt-4 bg-[#065F46] hover:bg-emerald-900 text-white font-bold px-5 py-2 rounded-xl text-sm transition"><%= banner.aksi %></a>
+                <% } %>
+            </div>
+
+            <% if (status === 'disetujui') { %>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+                    <% kartu.forEach(function (k) { %>
+                        <div class="<%= k.cls %> border rounded-2xl p-4 text-center">
+                            <span class="text-xs sm:text-sm font-bold"><%= k.label %></span>
+                            <p class="text-3xl sm:text-4xl font-light mt-1"><%= k.nilai %></p>
+                        </div>
+                    <% }); %>
+                </div>
+
+                <% if (ditolak.length > 0) { %>
+                    <div class="bg-red-50 border border-red-100 rounded-3xl p-5 mb-6">
+                        <h3 class="font-bold text-red-700">Produk ditolak admin</h3>
+                        <ul class="mt-2 text-sm text-red-800 list-disc pl-5">
+                            <% ditolak.forEach(function (p) { %><li><%= p.nama %></li><% }); %>
+                        </ul>
+                        <p class="text-xs text-red-700 mt-2">Edit produknya lalu simpan, otomatis diajukan ulang ke admin.</p>
+                        <a href="/umkm/produk" class="inline-block mt-2 text-sm font-bold underline text-red-700">Perbaiki di Kelola Produk</a>
+                    </div>
+                <% } %>
+            <% } %>
+
+            <h3 class="font-bold mb-3">Menu Utama</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                <% menu.forEach(function (m) { %>
+                    <% if (m.perluSetuju && status !== 'disetujui') { %>
+                        <div class="bg-gray-100 rounded-3xl p-5 sm:p-6 opacity-60 cursor-not-allowed">
+                            <h4 class="font-bold"><%= m.judul %></h4>
+                            <p class="text-gray-600 mt-2 text-sm">Terbuka setelah pendaftaran disetujui admin</p>
+                        </div>
+                    <% } else { %>
+                        <a href="<%= m.href %>" class="block bg-gray-100 hover:bg-emerald-50 border border-transparent hover:border-emerald-300 rounded-3xl p-5 sm:p-6 transition">
+                            <h4 class="font-bold"><%= m.judul %></h4>
+                            <p class="text-gray-600 mt-2 text-sm"><%= m.ket %></p>
+                        </a>
+                    <% } %>
+                <% }); %>
+            </div>
         </div>
-
-        <h3 class="font-bold mb-3">Menu Utama</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
-            <% menu.forEach(function (m) { %>
-                <a href="<%= m.href %>" class="block bg-gray-100 hover:bg-emerald-50 border border-transparent hover:border-emerald-300 rounded-3xl p-6 transition">
-                    <h4 class="font-bold"><%= m.judul %></h4>
-                    <p class="text-gray-600 mt-2"><%= m.ket %></p>
-                </a>
-            <% }); %>
-        </div>
-
-        <h3 class="font-bold mb-3">Akses Cepat</h3>
-        <a href="/umkm/pendaftaran" class="block bg-gray-100 hover:bg-emerald-50 border border-transparent hover:border-emerald-300 rounded-2xl p-8 text-center font-bold transition">
-            Form Pendaftaran UMKM
-        </a>
     </main>
 </div>
 <%- include('../partials/footer') %>
