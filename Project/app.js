@@ -18,6 +18,7 @@ const app = express();
 
 const session = require('express-session');
 const { muatUser } = require('./middlewares/auth');
+const chatRoutes = require('./routes/chat.routes');
 
 // View engine (EJS)
 app.set('view engine', 'ejs');
@@ -43,6 +44,7 @@ app.use('/', routes);          // Publik / buyer + API
 app.use(authRoutes);           // Login & register
 app.use(umkmRoutes);           // Pelaku UMKM
 app.use(adminRoutes);          // Admin
+app.use(chatRoutes);
 
 // 404, lalu error handler (harus paling bawah)
 app.use((req, res) => {
