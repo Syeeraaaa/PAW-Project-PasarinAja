@@ -1,36 +1,151 @@
 <!-- views/publik/chatbot.ejs -->
-<%- include('../partials/head', { title: `Chatbot AI - ${appName}` }) %>
+<%- include('../partials/head', { title: Chatbot AI - ${appName} }) %>
 <body class="bg-gray-50 text-gray-800 font-sans">
 <div class="min-h-screen flex flex-col md:flex-row">
     <%- include('../partials/sidebar', { aktif: 'chatbot' }) %>
 
-    <main class="flex-1 min-w-0 p-6 md:p-10 flex flex-col">
-        <div class="max-w-5xl w-full flex flex-col flex-1">
-            <h2 class="text-3xl font-extrabold text-gray-900">Tanya Desa (Chatbot AI)</h2>
-            <p class="text-gray-600 mb-6">Asisten virtual untuk informasi seputar UMKM dan Desa Paseban Kawis.</p>
+    <main class="flex-1 min-w-0 p-4 sm:p-6 md:p-10">
+        <div class="max-w-4xl">
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900">Chatbot AI</h2>
 
-            <!-- Kotak percakapan -->
-            <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 flex flex-col flex-1 min-h-[480px]">
+            <p class="text-gray-600 mb-4">
+                <%= mode === 'umkm'
+                    ? 'Asisten bisnis untuk membantu deskripsi produk dan promosi usaha kamu.'
+                    : 'Asisten virtual untuk informasi produk UMKM Desa Paseban Kawis.' %>
+            </p>
 
-                <!-- Area pesan -->
-                <div id="chat-messages" class="flex-1 overflow-y-auto space-y-4 pr-2">
-                    <!-- Pesan bot -->
+            <div class="bg-white border border-gray-200 rounded-2xl shadow-sm flex flex-col h-[calc(100dvh-12rem)] md:h-[calc(100dvh-11rem)] min-h-[420px]">
+
+                <!-- Area percakapan -->
+                <div id="chat-messages" class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4" aria-live="polite">
                     <div class="flex items-start gap-3">
-                        <div class="w-8 h-8 rounded-full bg-emerald-100 text-[#065F46] flex items-center justify-center font-bold text-sm shrink-0">AI</div>
-                        <div class="bg-emerald-50 text-emerald-900 rounded-2xl p-4 text-sm max-w-lg">
-                            Halo! Ada yang bisa saya bantu terkait produk UMKM, lokasi usaha, atau informasi menarik di Desa Paseban Kawis?
+                        <div class="w-8 h-8 rounded-full bg-emerald-100 text-[#065F46] flex items-center justify-center font-bold text-xs shrink-0">AI</div>
+                        <div class="bg-emerald-50 text-emerald-900 rounded-2xl px-4 py-3 text-sm max-w-[85%] sm:max-w-lg">
+                            <%= mode === 'umkm'
+                                ? 'Halo! Aku asisten bisnis PasarinAja. Tanyakan apa saja tentang produk dan promosi usaha kamu.'
+                                : 'Halo! Aku asisten PasarinAja. Tanyakan apa saja tentang produk UMKM Desa Paseban Kawis ya.' %>
                         </div>
                     </div>
                 </div>
 
+                <!-- Contoh pertanyaan -->
+                <%
+  const contoh = mode === 'umkm'
+    ? ['Bantu buatkan deskripsi produk', 'Bagaimana tips promosi produk di katalog?', 'Cara menambah produk di dashboard?']
+    : ['Produk apa saja yang tersedia?', 'Rekomendasi produk kerajinan', 'Bagaimana cara memesan produk?'];
+%>
+<div class="px-4 sm:px-6 pb-2 flex flex-wrap gap-2">
+    <% contoh.forEach(function (c) { %>
+        <button type="button" data-contoh="<%= c %>" class="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-full text-left"><%= c %></button>
+    <% }); %>
+</div>
+
                 <!-- Input pesan -->
-                <div class="mt-4 pt-4 border-t border-gray-100 flex gap-2">
-                    <input type="text" placeholder="Ketik pertanyaanmu di sini..." aria-label="Pertanyaan untuk chatbot"
-                           class="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-700">
-                    <button type="button" class="bg-[#065F46] hover:bg-emerald-900 text-white px-6 py-3 rounded-xl text-sm font-bold transition">Kirim</button>
-                </div>
+                <form id="chat-form" class="border-t border-gray-100 p-3 sm:p-4">
+                    <div class="flex gap-2">
+                        <input id="chat-input" type="text" maxlength="500" autocomplete="off"
+                               placeholder="Tulis pertanyaanmu....." aria-label="Pertanyaan untuk chatbot"
+                               class="flex-1 min-w-0 px-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-700">
+                        <button id="chat-kirim" type="submit"
+                                class="bg-[#065F46] hover:bg-emerald-900 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-3 rounded-xl text-sm font-bold transition">Kirim</button>
+                    </div>
+                    <p id="hitung" class="text-right text-xs text-gray-400 mt-1">0/500</p>
+                </form>
             </div>
         </div>
     </main>
 </div>
+
+<script>
+    (function () {
+        var MAKS = 500; // samakan dengan maxPesan di config/gemini.js
+        var form = document.getElementById('chat-form');
+        var input = document.getElementById('chat-input');
+        var tombol = document.getElementById('chat-kirim');
+        var daftar = document.getElementById('chat-messages');
+        var hitung = document.getElementById('hitung');
+        var sibuk = false;
+
+        var WARNA = {
+            user: 'bg-[#065F46] text-white',
+            bot: 'bg-emerald-50 text-emerald-900',
+            error: 'bg-red-100 text-red-700'
+        };
+
+        // Teks dimasukkan lewat textContent, jadi aman dari injeksi HTML
+        function gelembung(teks, jenis) {
+            var baris = document.createElement('div');
+            baris.className = 'flex ' + (jenis === 'user' ? 'justify-end' : 'justify-start');
+            var isi = document.createElement('div');
+            isi.className = 'max-w-[85%] sm:max-w-lg px-4 py-3 rounded-2xl text-sm whitespace-pre-wrap break-words ' + WARNA[jenis];
+            isi.textContent = teks;
+            baris.appendChild(isi);
+            daftar.appendChild(baris);
+            daftar.scrollTop = daftar.scrollHeight;
+            return baris;
+        }
+
+        function tampilkanLoading() {
+            var baris = gelembung('', 'bot');
+            baris.firstChild.innerHTML =
+                '<span class="inline-flex items-center gap-1 py-1" aria-label="AI sedang mengetik">' +
+                '<span class="w-2 h-2 bg-emerald-600 rounded-full animate-bounce"></span>' +
+                '<span class="w-2 h-2 bg-emerald-600 rounded-full animate-bounce" style="animation-delay:150ms"></span>' +
+                '<span class="w-2 h-2 bg-emerald-600 rounded-full animate-bounce" style="animation-delay:300ms"></span></span>';
+            return baris;
+        }
+
+        async function kirim(pesan) {
+            if (sibuk) return;
+            sibuk = true;
+            tombol.disabled = true;
+            input.disabled = true;
+
+            gelembung(pesan, 'user');
+            var memuat = tampilkanLoading();
+
+            try {
+                var res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: pesan })
+                });
+                var data = await res.json().catch(function () { return null; });
+                memuat.remove();
+
+                if (res.ok && data && data.success) {
+                    gelembung(data.data.reply, 'bot');
+                } else {
+                    gelembung((data && data.message) || 'Terjadi kesalahan. Coba lagi.', 'error');
+                }
+            } catch (e) {
+                memuat.remove();
+                gelembung('Tidak dapat terhubung ke server. Periksa koneksi internetmu lalu coba lagi.', 'error');
+            } finally {
+                sibuk = false;
+                tombol.disabled = false;
+                input.disabled = false;
+                input.focus();
+            }
+        }
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var pesan = input.value.trim();
+            if (!pesan) { input.focus(); return; }
+            if (pesan.length > MAKS) { gelembung('Pesan maksimal ' + MAKS + ' karakter.', 'error'); return; }
+            input.value = '';
+            hitung.textContent = '0/' + MAKS;
+            kirim(pesan);
+        });
+
+        input.addEventListener('input', function () {
+            hitung.textContent = input.value.length + '/' + MAKS;
+        });
+
+        document.querySelectorAll('[data-contoh]').forEach(function (b) {
+            b.addEventListener('click', function () { kirim(b.getAttribute('data-contoh')); });
+        });
+    })();
+</script>
 <%- include('../partials/footer') %>
