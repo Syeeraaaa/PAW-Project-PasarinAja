@@ -1,58 +1,39 @@
 const produkModel = require('../models/productModel');
 const config = require('../config/config');
+const { modeUntuk } = require('../config/gemini');
 const { formatRupiah } = require('../utils/formatter');
-const { modeUntuk } = require('../config/gemini')
 
-// ----------------------------------------------------------------
-// HALAMAN PUBLIK (RENDER EJS DENGAN SIDEBAR & PARTIAL)
-// ----------------------------------------------------------------
+const angkaValid = (v) =>
+  v !== undefined && String(v).trim() !== '' && Number.isFinite(Number(v)) && Number(v) >= 0;
 
-// Menampilkan Halaman Dashboard Publik
 const renderDashboard = (req, res) => {
+  // yang sudah login diarahkan ke dashboard sesuai perannya
   if (req.user) {
     return res.redirect(req.user.role === 'admin' ? '/admin/dashboard' : '/umkm/dashboard');
   }
   res.render('publik/dashboard', { appName: config.appName });
 };
 
-// Menampilkan Halaman Katalog Produk dengan Pencarian & Status Valid
 const renderKatalog = async (req, res, next) => {
-    try {
-        const q = req.query.q || '';
-        // Menggunakan pencarian khusus produk publik yang berstatus 'ditampilkan'
-        const produk = await produkModel.searchPublic ? await produkModel.searchPublic(q) : await produkModel.search(q);
-        
-        res.render('publik/katalog', { 
-            appName: config.appName, 
-            produk, 
-            q, 
-            formatRupiah,
-            aktif: 'katalog' // Indikator menu aktif di sidebar
-        });
-    } catch (error) {
-        next(error);
-    }
+  try {
+    const q = req.query.q || '';
+    const produk = await produkModel.searchPublic(q); 
+    res.render('publik/katalog', { appName: config.appName, produk, q, formatRupiah });
+  } catch (error) {
+    next(error);
+  }
 };
 
-// Menampilkan Halaman Detail Produk & Tombol WhatsApp Penjual
 const renderDetail = async (req, res, next) => {
-    try {
-        const produk = await produkModel.getById(req.params.id);
-        
-        // Validasi: Pastikan produk ada dan statusnya sudah ditampilkan
-        if (!produk || (produk.status && produk.status !== 'ditampilkan')) {
-            return res.status(404).send('Produk tidak ditemukan atau belum disetujui');
-        }
-
-        res.render('publik/detail', { 
-            appName: config.appName, 
-            produk, 
-            formatRupiah,
-            aktif: 'katalog' // Halaman detail tetap mengaktifkan menu katalog di sidebar
-        });
-    } catch (error) {
-        next(error);
+  try {
+    const produk = await produkModel.getById(req.params.id);
+    if (!produk || produk.status !== 'ditampilkan') {
+      return res.status(404).send('Produk tidak ditemukan');
     }
+    res.render('publik/detail', { appName: config.appName, produk, formatRupiah });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const renderChatbot = (req, res) => {
@@ -60,36 +41,93 @@ const renderChatbot = (req, res) => {
   res.render('publik/chatbot', { appName: config.appName, mode: modeUntuk(req.user) });
 };
 
-// ----------------------------------------------------------------
-// ENDPOINT API (FORMAT JSON)
-// ----------------------------------------------------------------
-
-// Cek Status Server
+// ---------- API ----------
 const getStatus = (req, res) => {
-    res.status(200).json({
-        status: 'ok',
-        message: 'Server berjalan dengan baik',
-        timestamp: new Date().toISOString(),
-    });
+  res.status(200).json({
+    status: 'ok',
+    message: 'Server berjalan dengan baik',
+    timestamp: new Date().toISOString(),
+  });
 };
 
-// Ambil Data Produk via API
+// GET /api/produk
 const getApiProducts = async (req, res, next) => {
-    try {
-        const produk = req.query.q
-            ? await produkModel.search(req.query.q)
-            : await produkModel.getAll();
-        res.status(200).json(produk);
-    } catch (error) {
-        next(error);
+  try {
+    const produk = req.query.q
+      ? await produkModel.search(req.query.q)
+      : await produkModel.getAll();
+    res.status(200).json(produk);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// GET /api/produk/:id
+const getApiProductById = async (req, res, next) => {
+  try {
+    const produk = await produkModel.getById(req.params.id);
+    if (!produk) return res.status(404).json({ message: 'Produk tidak ditemukan' });
+    res.status(200).json(produk);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// POST /api/produk
+const createApiProduct = async (req, res, next) => {
+  try {
+    const data = req.body || {};
+    if (!data.nama || !data.kategori || !angkaValid(data.harga)) {
+      return res.status(400).json({ message: 'nama, kategori, dan harga wajib diisi dengan benar' });
     }
+    if (data.stok !== undefined && !angkaValid(data.stok)) {
+      return res.status(400).json({ message: 'stok harus berupa angka' });
+    }
+    const produk = await produkModel.create(data);
+    res.status(201).json(produk);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// PUT /api/produk/:id
+const updateApiProduct = async (req, res, next) => {
+  try {
+    const data = req.body || {};
+    if (data.harga !== undefined && !angkaValid(data.harga)) {
+      return res.status(400).json({ message: 'harga harus berupa angka' });
+    }
+    if (data.stok !== undefined && !angkaValid(data.stok)) {
+      return res.status(400).json({ message: 'stok harus berupa angka' });
+    }
+    const produk = await produkModel.update(req.params.id, data);
+    if (!produk) return res.status(404).json({ message: 'Produk tidak ditemukan' });
+    res.status(200).json(produk);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// DELETE /api/produk/:id
+const deleteApiProduct = async (req, res, next) => {
+  try {
+    const produk = await produkModel.remove(req.params.id);
+    if (!produk) return res.status(404).json({ message: 'Produk tidak ditemukan' });
+    res.status(200).json({ message: 'Produk berhasil dihapus' });
+  } catch (error) {
+    next(error);
+  }
 };
 
 module.exports = {
-    renderDashboard,
-    renderKatalog,
-    renderDetail,
-    renderChatbot,
-    getStatus,
-    getApiProducts,
+  renderDashboard,
+  renderKatalog,
+  renderDetail,
+  renderChatbot,
+  getStatus,
+  getApiProducts,
+  getApiProductById,
+  createApiProduct,
+  updateApiProduct,
+  deleteApiProduct,
 };
