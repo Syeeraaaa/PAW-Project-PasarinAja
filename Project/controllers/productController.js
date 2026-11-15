@@ -1,6 +1,7 @@
 const produkModel = require('../models/productModel');
 const config = require('../config/config');
 const { formatRupiah } = require('../utils/formatter');
+const { modeUntuk } = require('../config/gemini')
 
 // ----------------------------------------------------------------
 // HALAMAN PUBLIK (RENDER EJS DENGAN SIDEBAR & PARTIAL)
@@ -54,12 +55,9 @@ const renderDetail = async (req, res, next) => {
     }
 };
 
-// Menampilkan Halaman Chatbot Desa
 const renderChatbot = (req, res) => {
-    res.render('publik/chatbot', { 
-        appName: config.appName, 
-        aktif: 'chatbot' // Indikator menu aktif di sidebar
-    });
+  delete req.session.riwayatChat;
+  res.render('publik/chatbot', { appName: config.appName, mode: modeUntuk(req.user) });
 };
 
 // ----------------------------------------------------------------
